@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>百事通返工与生产管理系统原型</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React and ReactDOM -->
+  <script src="https://cdn.staticfile.org/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.staticfile.org/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <!-- Babel -->
+  <script src="https://cdn.staticfile.org/babel-standalone/7.22.17/babel.min.js"></script>
+  <style>
+    /* 隐藏滚动条但保持功能 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- 7大物料分类定义 ---
+    const MATERIAL_TYPES = ["原料", "配方", "配方产品", "中间品", "产品", "内包材", "外包材"];
+
+    // --- 智能预置数据 ---
+    const INITIAL_MATERIALS = [
+      { id: "M001", code: "MAT-RAW-GLY", name: "甘油原液", type: "原料", status: 1, unit: "kg", bomCode: "" },
+      { id: "M002", code: "MAT-RAW-HA", name: "精纯透明质酸钠", type: "原料", status: 1, unit: "g", bomCode: "" },
+      { id: "M003", code: "MAT-RAW-H2O", name: "纯净高EDI水", type: "原料", status: 1, unit: "kg", bomCode: "" },
+      { id: "M004", code: "MAT-PAC-BTL", name: "50ml真空喷雾玻璃瓶", type: "内包材", status: 1, unit: "个", bomCode: "" },
+      { id: "M005", code: "MAT-PAC-BOX", name: "玻尿酸精装外包装盒", type: "外包材", status: 1, unit: "个", bomCode: "" },
+      { id: "M006", code: "MAT-FML-BNS", name: "玻尿酸高保湿舒缓配方", type: "配方", status: 1, unit: "L", bomCode: "BOM-FML-01" },
+      { id: "M007", code: "MAT-FMP-BNS", name: "玻尿酸高舒缓原液半成品", type: "配方产品", status: 1, unit: "L", bomCode: "BOM-FMP-01" },
+      { id: "M008", code: "MAT-MID-BNS", name: "玻尿酸原液内包半成品 (50ml瓶装)", type: "中间品", status: 1, unit: "支", bomCode: "BOM-MID-01" },
+      { id: "M009", code: "MAT-PRD-BNS", name: "玻尿酸修护补水精华液 (成品外盒装)", type: "产品", status: 1, unit: "盒", bomCode: "BOM-PRD-01" }
+    ];
+
+    const INITIAL_BOMS = [
+      { id: "B001", code: "BOM-FML-01", name: "玻尿酸舒缓配方标准BOM", materialCode: "MAT-FML-BNS", type: "配方", version: "V1.0", status: 1 },
+      { id: "B002", code: "BOM-FMP-01", name: "玻尿酸舒缓原液半成品标准BOM", materialCode: "MAT-FMP-BNS", type: "配方产品", version: "V1.0", status: 1 },
+      { id: "B003", code: "BOM-MID-01", name: "玻尿酸原液内包半成品标准BOM", materialCode: "MAT-MID-BNS", type: "中间品", version: "V1.0", status: 1 },
+      { id: "B004", code: "BOM-PRD-01", name: "玻尿酸成品标准盒装BOM", materialCode: "MAT-PRD-BNS", type: "产品", version: "V1.0", status: 1 }
+    ];
+
+    const INITIAL_BOM_ITEMS = [
+      { id: "BI001", bomId: "B001", materialCode: "MAT-RAW-GLY", materialName: "甘油原液", ratio: 15.0, type: "原料" },
+      { id: "BI002", bomId: "B001", materialCode: "MAT-RAW-HA", materialName: "精纯透明质酸钠", ratio: 2.5, type: "原料" },
+      { id: "BI003", bomId: "B001", materialCode: "MAT-RAW-H2O", materialName: "纯净高EDI水", ratio: 82.5, type: "原料" },
+      { id: "BI004", bomId: "B002", materialCode: "MAT-FML-BNS", materialName: "玻尿酸高保湿舒缓配方", ratio: 100.0, type: "配方" },
+      { id: "BI005", bomId: "B003", materialCode: "MAT-FMP-BNS", materialName: "玻尿酸高舒缓原液半成品", ratio: 100.0, type: "配方产品" },
+      { id: "BI006", bomId: "B003", materialCode: "MAT-PAC-BTL", materialName: "50ml真空喷雾玻璃瓶", ratio: 100.0, type: "内包材" },
+      { id: "BI007", bomId: "B004", materialCode: "MAT-MID-BNS", materialName: "玻尿酸原液内包半成品 (50ml瓶装)", ratio: 100.0, type: "中间品" },
+      { id: "BI008", bomId: "B004", materialCode: "MAT-PAC-BOX", materialName: "玻尿酸精装外包装盒", ratio: 100.0, type: "外包材" }
+    ];
+
+    const INITIAL_BOM_STEPS = [
+      { id: "BS001", bomId: "B001", stepNum: 1, desc: "原料无菌计量投料并静置脱泡" },
+      { id: "BS002", bomId: "B001", stepNum: 2, desc: "恒温反应釜高剪切搅拌乳化" },
+      { id: "BS003", bomId: "B002", stepNum: 1, desc: "乳化原液滤网物理多级精滤" },
+      { id: "BS004", bomId: "B003", stepNum: 1, desc: "玻璃瓶无菌空气吹扫与灭菌" },
+      { id: "BS005", bomId: "B003", stepNum: 2, desc: "高精度气动定量灌装并套泵头压紧密封" },
+      { id: "BS006", bomId: "B004", stepNum: 1, desc: "瓶身人工贴标并外包装喷码" },
+      { id: "BS007", bomId: "B004", stepNum: 2, desc: "装入精装礼盒并覆盖塑封防伪膜" }
+    ];
+
+    const INITIAL_BOM_STEP_FEEDS = [
+      { id: "BF001", bomId: "B001", stepNum: 1, materialCode: "MAT-RAW-GLY", materialName: "甘油原液" },
+      { id: "BF002", bomId: "B001", stepNum: 1, materialCode: "MAT-RAW-HA", materialName: "精纯透明质酸钠" },
+      { id: "BF003", bomId: "B001", stepNum: 1, materialCode: "MAT-RAW-H2O", materialName: "纯净高EDI水" },
+      { id: "BF004", bomId: "B003", stepNum: 1, materialCode: "MAT-PAC-BTL", materialName: "50ml真空喷雾玻璃瓶" },
+      { id: "BF005", bomId: "B003", stepNum: 2, materialCode: "MAT-FMP-BNS", materialName: "玻尿酸高舒缓原液半成品" },
+      { id: "BF006", bomId: "B004", stepNum: 1, materialCode: "MAT-MID-BNS", materialName: "玻尿酸原液内包半成品 (50ml瓶装)" },
+      { id: "BF007", bomId: "B004", stepNum: 2, materialCode: "MAT-PAC-BOX", materialName: "玻尿酸精装外包装盒" }
+    ];
+
+    const INITIAL_BOM_PARAMS = [
+      { id: "BP001", stepId: "BS001", name: "高EDI水初始电导率", planVal: 0.1, unit: "μS/cm", maxVal: 0.2, minVal: 0 },
+      { id: "BP002", stepId: "BS002", name: "反应釜加热温度", planVal: 45, unit: "℃", maxVal: 50, minVal: 40 },
+      { id: "BP003", stepId: "BS002", name: "搅拌主轴转速", planVal: 120, unit: "r/min", maxVal: 150, minVal: 100 },
+      { id: "BP004", stepId: "BS005", name: "定量灌装精准容积", planVal: 50.5, unit: "ml", maxVal: 51.0, minVal: 50.0 },
+      { id: "BP005", stepId: "BS007", name: "封口热缩炉工作温度", planVal: 140, unit: "℃", maxVal: 150, minVal: 130 }
+    ];
+
+    const INITIAL_BATCHES = [
+      { id: "BAT001", batchNo: "BT260601A1", materialCode: "MAT-RAW-GLY", materialName: "甘油原液", type: 1, mfgDate: "2026-05-15", expDate: "2028-05-14", stockQty: 300, qcStatus: 1 },
+      { id: "BAT002", batchNo: "BT260601A2", materialCode: "MAT-RAW-HA", materialName: "精纯透明质酸钠", type: 1, mfgDate: "2026-05-10", expDate: "2028-05-09", stockQty: 200, qcStatus: 1 },
+      { id: "BAT003", batchNo: "BT260601A3", materialCode: "MAT-RAW-H2O", materialName: "纯净高EDI水", type: 1, mfgDate: "2026-06-01", expDate: "2027-05-31", stockQty: 1000, qcStatus: 1 },
+      { id: "BAT004", batchNo: "BT260601A4", materialCode: "MAT-PAC-BTL", materialName: "50ml真空喷雾玻璃瓶", type: 1, mfgDate: "2026-04-12", expDate: "2031-04-11", stockQty: 600, qcStatus: 1 },
+      { id: "BAT005", batchNo: "BT260601A5", materialCode: "MAT-PAC-BOX", materialName: "玻尿酸精装外包装盒", type: 1, mfgDate: "2026-04-15", expDate: "2031-04-14", stockQty: 400, qcStatus: 1 }
+    ];
+
+    const INITIAL_PLANS = [
+      { id: "PL20260602001", code: "PL20260602001", materialCode: "MAT-PRD-BNS", materialName: "玻尿酸修护补水精华液 (成品外盒装)", bomCode: "BOM-PRD-01", targetQty: 200, planStartDate: "2026-06-03", planEndDate: "2026-06-05", status: 2, downQty: 0 }
+    ];
+
+    // --- 内联精美 SVG 图标组件 ---
+    const Icon = ({ name, className = "w-5 h-5" }) => {
+      const svgs = {
+        database: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />,
+        plan: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />,
+        production: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />,
+        cart: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63.184 1.707.707 1.707H17" />,
+        plus: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />,
+        check: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />,
+        x: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />,
+        refresh: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />,
+        flow: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M3 9a9 9 0 019-9h0a9 9 0 019 9v0a9 9 0 01-9 9h0a9 9 0 01-9-9" />,
+        info: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      };
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {svgs[name] || <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01" />}
+        </svg>
+      );
+    };
+
+    function App() {
+      const [activeMenu, setActiveMenu] = useState("materials");
+      const [sidebarExpanded, setSidebarExpanded] = useState({ basic: true, plan: true, prod: true, pur: true });
+
+      // 数据状态
+      const [materials, setMaterials] = useState(() => JSON.parse(localStorage.getItem("b_materials")) || INITIAL_MATERIALS);
+      const [boms, setBoms] = useState(() => JSON.parse(localStorage.getItem("b_boms")) || INITIAL_BOMS);
+      const [bomItems, setBomItems] = useState(() => JSON.parse(localStorage.getItem("b_bom_items")) || INITIAL_BOM_ITEMS);
+      const [bomSteps, setBomSteps] = useState(() => JSON.parse(localStorage.getItem("b_bom_steps")) || INITIAL_BOM_STEPS);
+      const [bomStepFeeds, setBomStepFeeds] = useState(() => JSON.parse(localStorage.getItem("b_bom_step_feeds")) || INITIAL_BOM_STEP_FEEDS);
+      const [bomParams, setBomParams] = useState(() => JSON.parse(localStorage.getItem("b_bom_params")) || INITIAL_BOM_PARAMS);
+      const [batches, setBatches] = useState(() => JSON.parse(localStorage.getItem("b_batches")) || INITIAL_BATCHES);
+
+      const [plans, setPlans] = useState(() => JSON.parse(localStorage.getItem("b_plans")) || INITIAL_PLANS);
+      const [productionOrders, setProductionOrders] = useState(() => JSON.parse(localStorage.getItem("b_prods")) || []);
+      const [requisitions, setRequisitions] = useState(() => JSON.parse(localStorage.getItem("b_reqs")) || []);
+      const [purchases, setPurchases] = useState(() => JSON.parse(localStorage.getItem("b_purchs")) || []);
+      const [stockIns, setStockIns] = useState(() => JSON.parse(localStorage.getItem("b_stockins")) || []);
+      const [feeds, setFeeds] = useState([]);
+      const [returns, setReturns] = useState([]);
+
+      // 弹窗与选中状态
+      const [showModal, setShowModal] = useState(null);
+      const [selectedBom, setSelectedBom] = useState(INITIAL_BOMS[3]);
+      const [toastMsg, setToastMsg] = useState("");
+      
+      const [wizardStep, setWizardStep] = useState(1);
+      const [wizardBom, setWizardBom] = useState({
+        code: "", name: "", materialCode: "", type: "产品", version: "V1.0",
+        items: [], steps: [], stepFeeds: [], params: []
+      });
+
+      const [autoBindMaterialCode, setAutoBindMaterialCode] = useState(null);
+      const [searchMaterial, setSearchMaterial] = useState("");
+      const [filterType, setFilterType] = useState("all");
+      const [searchBom, setSearchBom] = useState("");
+
+      // 同步本地存储
+      useEffect(() => {
+        localStorage.setItem("b_materials", JSON.stringify(materials));
+        localStorage.setItem("b_boms", JSON.stringify(boms));
+        localStorage.setItem("b_bom_items", JSON.stringify(bomItems));
+        localStorage.setItem("b_bom_steps", JSON.stringify(bomSteps));
+        localStorage.setItem("b_bom_step_feeds", JSON.stringify(bomStepFeeds));
+        localStorage.setItem("b_bom_params", JSON.stringify(bomParams));
+        localStorage.setItem("b_batches", JSON.stringify(batches));
+        localStorage.setItem("b_plans", JSON.stringify(plans));
+        localStorage.setItem("b_prods", JSON.stringify(productionOrders));
+        localStorage.setItem("b_reqs", JSON.stringify(requisitions));
+        localStorage.setItem("b_purchs", JSON.stringify(purchases));
+        localStorage.setItem("b_stockins", JSON.stringify(stockIns));
+      }, [materials, boms, bomItems, bomSteps, bomStepFeeds, bomParams, batches, plans, productionOrders, requisitions, purchases, stockIns]);
+
+      const showToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(""), 3500);
+      };
+
+      const handleResetData = () => {
+        if (confirm("确定重置演示数据库吗？")) {
+          localStorage.clear();
+          location.reload();
+        }
+      };
+
+      const handleOpenBomWizard = (predefinedMaterialCode = null) => {
+        const defaultCode = `BOM-${Date.now().toString().slice(-6)}`;
+        let defaultType = "产品";
+        if (predefinedMaterialCode) {
+          const mat = materials.find(m => m.code === predefinedMaterialCode);
+          if (mat) defaultType = mat.type;
+        }
+        setWizardBom({
+          code: defaultCode,
+          name: "",
+          materialCode: predefinedMaterialCode || "",
+          type: defaultType,
+          version: "V1.1",
+          items: [],
+          steps: [
+            { stepNum: 1, desc: "标准工艺前处理、计量物料" },
+            { stepNum: 2, desc: "车间工艺设备运行、搅拌与产出" }
+          ],
+          stepFeeds: [],
+          params: [
+            { stepNum: 1, name: "搅拌设备主轴转速", planVal: "100", unit: "r/min", minVal: "80", maxVal: "120" }
+          ]
+        });
+        setWizardStep(1);
+        setAutoBindMaterialCode(predefinedMaterialCode);
+        setShowModal("bomWizard");
+      };
+
+      const handleReleaseProdOrder = (plan) => {
+        const qtyStr = prompt(`请输入本次下派数量 (计划总量:${plan.targetQty}, 已下达:${plan.downQty}):`, plan.targetQty - plan.downQty);
+        const qty = Number(qtyStr);
+        if (!qty || isNaN(qty) || qty <= 0) return;
+
+        const matchedBom = boms.find(b => b.code === plan.bomCode);
+        if (!matchedBom) {
+          alert("该计划尚未绑定配方BOM，请先前往BOM页建立并绑定该成品物料的完整工艺BOM！");
+          return;
+        }
+
+        const prodCode = `SC${new Date().toISOString().slice(2,10).replace(/-/g, "")}${Math.floor(Math.random()*1000).toString().padStart(3,"0")}`;
+        const newProd = {
+          id: prodCode,
+          code: prodCode,
+          planCode: plan.code,
+          materialCode: plan.materialCode,
+          materialName: plan.materialName,
+          bomCode: plan.bomCode,
+          targetQty: qty,
+          status: 1,
+          flStatus: 0,
+          createTime: new Date().toLocaleString()
+        };
+
+        setPlans(plans.map(p => p.id === plan.id ? { ...p, downQty: p.downQty + qty } : p));
+        setProductionOrders([newProd, ...productionOrders]);
+
+        // MRP 欠料分析
+        const activeItems = bomItems.filter(bi => bi.bomId === matchedBom.id);
+        activeItems.forEach(item => {
+          const needQty = qty * (item.ratio / 100);
+          const stockSum = batches
+            .filter(b => b.materialCode === item.materialCode && b.qcStatus === 1)
+            .reduce((sum, b) => sum + b.stockQty, 0);
+
+          if (stockSum < needQty) {
+            const gap = needQty - stockSum;
+            setRequisitions(prev => [{
+              id: `REQD-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+              prodOrderCode: prodCode,
+              materialCode: item.materialCode,
+              materialName: item.materialName,
+              needQty: parseFloat(needQty.toFixed(2)),
+              stockQty: parseFloat(stockSum.toFixed(2)),
+              shortfall: parseFloat(gap.toFixed(2)),
+              status: 0,
+              createTime: new Date().toLocaleString()
+            }, ...prev]);
+          }
+        });
+
+        showToast(`生产订单 ${prodCode} 下发完成！并自动触发了用料MRP分析。`);
+        setActiveMenu("production");
+      };
+
+      const handleAutoRequisition = (reqItem) => {
+        const reqNo = `SG${Date.now().toString().slice(-6)}`;
+        setPurchases([{
+          id: reqNo,
+          reqNo: reqNo,
+          materialCode: reqItem.materialCode,
+          materialName: reqItem.materialName,
+          qty: reqItem.shortfall,
+          status: 1,
+          purStatus: 1,
+          createTime: new Date().toLocaleString(),
+          sourceReqId: reqItem.id
+        }, ...purchases]);
+        setRequisitions(requisitions.map(r => r.id === reqItem.id ? { ...r, status: 1 } : r));
+        showToast(`合并物料申购单 ${reqNo} 创建成功！`);
+        setActiveMenu("purchases");
+      };
+
+      const handleCreatePurchase = (req) => {
+        const poNo = `CG${Date.now().toString().slice(-6)}`;
+        setPurchases(purchases.map(p => p.id === req.id ? { ...p, purStatus: 2 } : p));
+        setStockIns([{
+          id: poNo,
+          poNo: poNo,
+          reqNo: req.reqNo,
+          materialCode: req.materialCode,
+          materialName: req.materialName,
+          qty: req.qty,
+          status: 0,
+          supplier: "百事通化妆品供应链集团",
+          rcvQty: 0
+        }, ...stockIns]);
+        showToast(`采购订单 ${poNo} 已流转给供应商！`);
+      };
+
+      const handleReceivePurchase = (po) => {
+        const rQty = Number(prompt(`请输入点收回料的实际数量 (订购量:${po.qty}):`, po.qty));
+        if (!rQty || isNaN(rQty) || rQty <= 0) return;
+
+        const dateStr = new Date().toISOString().slice(2,10).replace(/-/g, "");
+        const batchNo = `BT${dateStr}A${Math.floor(Math.random()*100).toString().padStart(2,"0")}`;
+
+        setBatches([{
+          id: `BAT${Date.now()}`,
+          batchNo: batchNo,
+          materialCode: po.materialCode,
+          materialName: po.materialName,
+          type: 1,
+          sourceNo: po.poNo,
+          mfgDate: new Date().toISOString().slice(0, 10),
+          expDate: new Date(Date.now() + 365*2*24*60*60*1000).toISOString().slice(0, 10),
+          stockQty: rQty,
+          qcStatus: 1
+        }, ...batches]);
+        setStockIns(stockIns.map(si => si.id === po.id ? { ...si, status: 1, rcvQty: rQty } : si));
+        setPurchases(purchases.map(p => p.reqNo === po.reqNo ? { ...p, purStatus: 3 } : p));
+        showToast(`回料验收成功！批次 ${batchNo} 入库完成。`);
+      };
+
+      const handleFIFOIssue = (order) => {
+        const matchedBom = boms.find(b => b.code === order.bomCode);
+        if (!matchedBom) return;
+
+        const activeItems = bomItems.filter(bi => bi.bomId === matchedBom.id);
+        let failedList = [];
+        const updatedBatches = [...batches];
+
+        activeItems.forEach(item => {
+          const needed = order.targetQty * (item.ratio / 100);
+          const availables = updatedBatches.filter(b => b.materialCode === item.materialCode && b.qcStatus === 1);
+          
+          let allocated = 0;
+          for (let b of availables) {
+            const need = needed - allocated;
+            if (b.stockQty >= need) {
+              b.stockQty -= need;
+              allocated = needed;
+              break;
+            } else {
+              allocated += b.stockQty;
+              b.stockQty = 0;
+            }
+          }
+
+          if (allocated < needed) {
+            failedList.push(`${item.materialName} (缺口:${(needed - allocated).toFixed(2)})`);
+          }
+        });
+
+        if (failedList.length > 0) {
+          alert(`先进先出(FIFO)配发料失败！以下原辅物料在库合格批次不足：\n- ${failedList.join("\n- ")}`);
+          return;
+        }
+
+        setBatches(updatedBatches);
+        setProductionOrders(productionOrders.map(p => p.id === order.id ? { ...p, status: 2, flStatus: 2 } : p));
+        setReturns([{
+          id: `LL-${Date.now().toString().slice(-5)}`,
+          orderCode: order.code,
+          time: new Date().toLocaleString(),
+          type: "已按先进先出(FIFO)自动出库发料"
+        }, ...returns]);
+        showToast(`仓库按“FIFO”自动发料，生产状态更新为“返工中”。`);
+      };
+
+      const handleFinishProduction = (order) => {
+        const dateStr = new Date().toISOString().slice(2,10).replace(/-/g, "");
+        const batchNo = `FG${dateStr}A01`;
+
+        setBatches([{
+          id: `BAT${Date.now()}`,
+          batchNo: batchNo,
+          materialCode: order.materialCode,
+          materialName: order.materialName,
+          type: 3,
+          sourceNo: order.code,
+          mfgDate: new Date().toISOString().slice(0, 10),
+          expDate: new Date(Date.now() + 365*2*24*60*60*1000).toISOString().slice(0, 10),
+          stockQty: order.targetQty,
+          qcStatus: 1
+        }, ...batches]);
+        setProductionOrders(productionOrders.map(p => p.id === order.id ? { ...p, status: 3 } : p));
+        showToast(`成品包装完工结案并入库！批次号: ${batchNo}`);
+      };
+
+      const getAvailableSubMaterials = (currentType) => {
+        if (currentType === "配方") return materials.filter(m => m.type === "原料");
+        if (currentType === "配方产品") return materials.filter(m => m.type === "配方");
+        if (currentType === "中间品") return materials.filter(m => m.type === "配方产品" || m.type === "内包材");
+        if (currentType === "产品") return materials.filter(m => m.type === "中间品" || m.type === "外包材");
+        return [];
+      };
+
+      const filteredMaterials = materials.filter(m => {
+        const matchSearch = m.name.toLowerCase().includes(searchMaterial.toLowerCase()) || m.code.toLowerCase().includes(searchMaterial.toLowerCase());
+        const matchType = filterType === "all" || m.type === filterType;
+        return matchSearch && matchType;
+      });
+
+      const filteredBoms = boms.filter(b => {
+        return b.name.toLowerCase().includes(searchBom.toLowerCase()) || b.code.toLowerCase().includes(searchBom.toLowerCase()) || b.materialCode.toLowerCase().includes(searchBom.toLowerCase());
+      });
+
+      return (
+        <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-800 font-sans">
+          
+          {/* Toast 通知 */}
+          {toastMsg && (
+            <div className="fixed top-5 right-5 z-50 bg-teal-600 text-white px-5 py-3 rounded-lg shadow-2xl flex items-center gap-2 animate-bounce">
+              <Icon name="check" className="w-5 h-5" />
+              <span className="font-bold text-sm">{toastMsg}</span>
+            </div>
+          )}
+
+          {/* 侧边栏 */}
+          <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0">
+            <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center gap-2">
+              <span className="font-bold text-white text-base tracking-wider flex items-center gap-1.5">
+                <Icon name="flow" className="w-5 h-5 text-indigo-400" />
+                百事通日化返工原型
+              </span>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
+              <div>
+                <button onClick={() => setSidebarExpanded(prev => ({ ...prev, basic: !prev.basic }))} className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-200">
+                  <span>1. 基础配方数据</span>
+                  <span>{sidebarExpanded.basic ? "▼" : "▶"}</span>
+                </button>
+                {sidebarExpanded.basic && (
+                  <div className="mt-1 ml-2 space-y-1">
+                    <button onClick={() => setActiveMenu("materials")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "materials" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="database" className="w-4 h-4" /> 物料大类管理
+                    </button>
+                    <button onClick={() => setActiveMenu("boms")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "boms" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="plan" className="w-4 h-4" /> 工艺BOM配方路线
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2">
+                <button onClick={() => setSidebarExpanded(prev => ({ ...prev, plan: !prev.plan }))} className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-200">
+                  <span>2. 计划调度</span>
+                  <span>{sidebarExpanded.plan ? "▼" : "▶"}</span>
+                </button>
+                {sidebarExpanded.plan && (
+                  <div className="mt-1 ml-2 space-y-1">
+                    <button onClick={() => setActiveMenu("plans")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "plans" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="plan" className="w-4 h-4" /> 计划与配方下发
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2">
+                <button onClick={() => setSidebarExpanded(prev => ({ ...prev, prod: !prev.prod }))} className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-200">
+                  <span>3. 车间中控</span>
+                  <span>{sidebarExpanded.prod ? "▼" : "▶"}</span>
+                </button>
+                {sidebarExpanded.prod && (
+                  <div className="mt-1 ml-2 space-y-1">
+                    <button onClick={() => setActiveMenu("production")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "production" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="production" className="w-4 h-4" /> 生产单执行与投料
+                    </button>
+                    <button onClick={() => setActiveMenu("batches")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "batches" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="check" className="w-4 h-4" /> 批次保质期账册
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2">
+                <button onClick={() => setSidebarExpanded(prev => ({ ...prev, pur: !prev.pur }))} className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-200">
+                  <span>4. 物流物控</span>
+                  <span>{sidebarExpanded.pur ? "▼" : "▶"}</span>
+                </button>
+                {sidebarExpanded.pur && (
+                  <div className="mt-1 ml-2 space-y-1">
+                    <button onClick={() => setActiveMenu("requisitions")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "requisitions" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="info" className="w-4 h-4" /> 申购需求单 (欠料行)
+                    </button>
+                    <button onClick={() => setActiveMenu("purchases")} className={`flex items-center gap-2 w-full px-3 py-2 rounded text-sm transition ${activeMenu === "purchases" ? "bg-indigo-600 text-white font-semibold" : "hover:bg-slate-800 text-slate-400"}`}>
+                      <Icon name="cart" className="w-4 h-4" /> 采购及回料点收
+                    </button>
+                  </div>
+                )}
+              </div>
+            </nav>
+
+            <div className="p-4 bg-slate-950 border-t border-slate-800">
+              <button onClick={handleResetData} className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded text-xs font-bold flex items-center justify-center gap-1 transition">
+                <Icon name="refresh" className="w-3.5 h-3.5" />
+                重置演示数据库
+              </button>
+            </div>
+          </aside>
+
+          {/* 主面板 */}
+          <main className="flex-1 flex flex-col overflow-hidden">
+            <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 flex-shrink-0">
+              <h1 className="text-base font-bold text-slate-800">
+                {activeMenu === "materials" && "物料管理 · 7大递进物料主数据账册"}
+                {activeMenu === "boms" && "工艺BOM路线 · 级联配方路线图"}
+                {activeMenu === "plans" && "计划调度 · MRP运算下派"}
+                {activeMenu === "production" && "车间中控 · 投产、发料与中控参数监控"}
+                {activeMenu === "batches" && "批次管理 · 先进先出保质期账册"}
+                {activeMenu === "requisitions" && "物控分析 · 原辅包材深度欠料行"}
+                {activeMenu === "purchases" && "物流物控 · 采购在途与回料质量点收"}
+              </h1>
+              <span className="text-xs text-slate-400 font-mono bg-slate-100 px-3 py-1 rounded">双击直接运行版本</span>
+            </header>
+
+            <section className="flex-1 overflow-y-auto p-6 space-y-6">
+              
+              {/* === 1. 物料管理 === */}
+              {activeMenu === "materials" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-7 gap-2.5">
+                    {MATERIAL_TYPES.map(t => (
+                      <div key={t} className="bg-white p-2.5 rounded-lg border text-center shadow-sm">
+                        <p className="text-[10px] text-slate-400 font-bold">{t}</p>
+                        <p className="text-base font-extrabold text-slate-800 mt-1 font-mono">{materials.filter(m => m.type === t).length}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-white rounded-xl border">
+                    <div className="p-4 border-b flex justify-between items-center bg-slate-50/50">
+                      <div className="flex gap-2 flex-1 max-w-lg">
+                        <input type="text" placeholder="模糊检索编码、名称..." value={searchMaterial} onChange={(e) => setSearchMaterial(e.target.value)} className="border rounded px-3 py-1.5 text-xs flex-1" />
+                        <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="border rounded px-2 py-1 bg-white text-xs text-slate-500">
+                          <option value="all">全部类型</option>
+                          {MATERIAL_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <button onClick={() => setShowModal("materialAdd")} className="bg-indigo-600 text-white px-3 py-1.5 rounded text-xs font-bold flex items-center gap-0.5"><Icon name="plus" className="w-3.5 h-3.5" />登记新物料</button>
+                    </div>
+
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                          <th className="py-2.5 px-4">编码</th>
+                          <th className="py-2.5 px-4">规格名称</th>
+                          <th className="py-2.5 px-4">大类分类</th>
+                          <th className="py-2.5 px-4">单位</th>
+                          <th className="py-2.5 px-4">关联BOM</th>
+                          <th className="py-2.5 px-4 text-center">BOM操作</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredMaterials.map(m => {
+                          const needsBOM = ["配方", "配方产品", "中间品", "产品"].includes(m.type);
+                          const boundBOM = boms.find(b => b.code === m.bomCode || b.materialCode === m.code);
+                          return (
+                            <tr key={m.id} className="hover:bg-slate-50/50">
+                              <td className="py-3 px-4 font-mono font-bold text-indigo-600">{m.code}</td>
+                              <td className="py-3 px-4 font-bold text-slate-800">{m.name}</td>
+                              <td className="py-3 px-4"><span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">{m.type}</span></td>
+                              <td className="py-3 px-4 text-slate-500">{m.unit}</td>
+                              <td className="py-3 px-4 font-mono">
+                                {needsBOM ? (
+                                  boundBOM ? <span className="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">{boundBOM.code}</span> : <span className="text-rose-500 font-bold">● 未关联BOM</span>
+                                ) : "-" }
+                              </td>
+                              <td className="py-3 px-4 text-center">
+                                {needsBOM && (
+                                  <div className="flex justify-center gap-1.5">
+                                    {boundBOM ? (
+                                      <button onClick={() => { setSelectedBom(boundBOM); setActiveMenu("boms"); }} className="text-indigo-600 hover:underline">查看BOM</button>
+                                    ) : (
+                                      <>
+                                        <select onChange={(e) => {
+                                          if (e.target.value) {
+                                            setMaterials(materials.map(mat => mat.id === m.id ? { ...mat, bomCode: e.target.value } : mat));
+                                            showToast(`关联成功: ${e.target.value}`);
+                                          }
+                                        }} className="text-[10px] border rounded">
+                                          <option value="">绑定已有BOM</option>
+                                          {boms.filter(b => b.type === m.type).map(b => <option key={b.id} value={b.code}>{b.code}</option>)}
+                                        </select>
+                                        <button onClick={() => handleOpenBomWizard(m.code)} className="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">一键新建BOM</button>
+                                      </>
+                                    )}
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* === 2. BOM工艺配方 === */}
+              {activeMenu === "boms" && (
+                <div className="grid grid-cols-3 gap-6 items-start">
+                  <div className="col-span-1 bg-white rounded-xl border p-2">
+                    <span className="font-bold text-slate-700 text-xs px-2 block py-1">BOM配方主表</span>
+                    <input type="text" placeholder="检索BOM..." value={searchBom} onChange={(e) => setSearchBom(e.target.value)} className="border rounded px-2 py-1 text-[11px] w-full mt-2" />
+                    <div className="divide-y max-h-[480px] overflow-y-auto mt-2 no-scrollbar">
+                      {filteredBoms.map(b => (
+                        <div key={b.id} onClick={() => setSelectedBom(b)} className={`p-2.5 rounded-lg cursor-pointer transition text-xs mt-1 ${selectedBom?.id === b.id ? "bg-indigo-50 border-l-4 border-indigo-600" : "hover:bg-slate-50"}`}>
+                          <div className="flex justify-between font-mono font-bold text-slate-400 text-[10px]">
+                            <span>{b.code}</span>
+                            <span className="text-indigo-600">{b.type}</span>
+                          </div>
+                          <p className="font-bold text-slate-800 mt-1">{b.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 space-y-6">
+                    {selectedBom ? (
+                      <>
+                        <div className="bg-white rounded-xl border p-4">
+                          <h3 className="font-bold text-slate-800 text-sm">{selectedBom.name} 的配方配比</h3>
+                          <table className="w-full text-left text-xs border-collapse mt-3">
+                            <thead>
+                              <tr className="bg-slate-50 border-b text-slate-500 font-bold">
+                                <th className="p-2">编码</th>
+                                <th className="p-2">名称</th>
+                                <th className="p-2">大类</th>
+                                <th className="p-2 text-right">参考占比</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {bomItems.filter(bi => bi.bomId === selectedBom.id).map(item => (
+                                <tr key={item.id} className="hover:bg-slate-50/50">
+                                  <td className="p-2 font-mono text-slate-400">{item.materialCode}</td>
+                                  <td className="p-2 font-bold text-slate-700">{item.materialName}</td>
+                                  <td className="p-2">{item.type}</td>
+                                  <td className="p-2 text-right font-mono font-bold text-slate-800">{item.ratio}%</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div className="bg-white rounded-xl border p-4">
+                          <h3 className="font-bold text-slate-800 text-sm mb-3">中控工艺步骤及运行控制标准</h3>
+                          <div className="space-y-4">
+                            {bomSteps.filter(bs => bs.bomId === selectedBom.id).map(step => {
+                              const stepFeeds = bomStepFeeds.filter(bf => bf.bomId === selectedBom.id && bf.stepNum === step.stepNum);
+                              const stepParams = bomParams.filter(bp => bp.stepId === step.id);
+                              return (
+                                <div key={step.id} className="p-3 bg-slate-50 border rounded-lg">
+                                  <p className="font-bold text-slate-800 text-xs">【工序 {step.stepNum}】 {step.desc}</p>
+                                  
+                                  {stepFeeds.length > 0 && (
+                                    <div className="mt-1.5 pl-6 flex items-center gap-1.5 flex-wrap">
+                                      <span className="text-[10px] text-slate-400 font-bold">投料投入:</span>
+                                      {stepFeeds.map(f => (
+                                        <span key={f.id} className="bg-indigo-50 text-indigo-700 border border-indigo-100 rounded px-1.5 py-0.5 text-[9px] font-semibold">{f.materialName}</span>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {stepParams.length > 0 && (
+                                    <div className="grid grid-cols-2 gap-2 pl-6 mt-2 pt-2 border-t border-dashed">
+                                      {stepParams.map(param => (
+                                        <div key={param.id} className="bg-white p-2 border rounded flex justify-between items-center text-[10px]">
+                                          <span className="text-slate-400">{param.name}</span>
+                                          <span className="font-bold text-indigo-700">{param.planVal} {param.unit} <span className="text-slate-300 font-normal">({param.minVal}~{param.maxVal})</span></span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    ) : <p className="p-6 text-center text-slate-400 bg-white border rounded-xl">选择BOM以查看详情</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* === 3. 计划单管理 === */}
+              {activeMenu === "plans" && (
+                <div className="bg-white rounded-xl border p-4">
+                  <span className="font-bold text-slate-800 text-sm block mb-3">待生产返工计划</span>
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                        <th className="p-2.5">计划单号</th>
+                        <th className="p-2.5">对应成品</th>
+                        <th className="p-2.5">工艺BOM</th>
+                        <th className="p-2.5 text-right">计划总量</th>
+                        <th className="p-2.5 text-right">已派产数</th>
+                        <th className="p-2.5 text-center">指令下派</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {plans.map(p => (
+                        <tr key={p.id} className="hover:bg-slate-50/50">
+                          <td className="p-2.5 font-mono font-bold text-slate-700">{p.code}</td>
+                          <td className="p-2.5 font-bold text-slate-800">{p.materialName}</td>
+                          <td className="p-2.5 font-mono text-indigo-600 font-bold">{p.bomCode}</td>
+                          <td className="p-2.5 text-right font-mono font-bold">{p.targetQty}</td>
+                          <td className="p-2.5 text-right font-mono text-indigo-600 font-bold">{p.downQty}</td>
+                          <td className="p-2.5 text-center">
+                            <button onClick={() => handleReleaseProdOrder(p)} className="bg-indigo-600 text-white font-bold text-[11px] px-3 py-1 rounded">下派生产</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* === 4. 生产车间中控 === */}
+              {activeMenu === "production" && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl border p-4">
+                    <span className="font-bold text-slate-800 text-sm block mb-3">车间生产指令监控台</span>
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                          <th className="p-2.5">生产单号</th>
+                          <th className="p-2.5">成品规格</th>
+                          <th className="p-2.5 text-right">投产数</th>
+                          <th className="p-2.5">发料状态</th>
+                          <th className="p-2.5">中控状态</th>
+                          <th className="p-2.5 text-center">流转操作</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {productionOrders.length === 0 ? (
+                          <tr><td colSpan="6" className="py-6 text-center text-slate-400">暂无活动指令，请前往计划页派产</td></tr>
+                        ) : (
+                          productionOrders.map(o => (
+                            <tr key={o.id} className="hover:bg-slate-50/50">
+                              <td className="p-2.5 font-mono font-bold text-indigo-600">{o.code}</td>
+                              <td className="p-2.5 font-bold text-slate-800">{o.materialName}</td>
+                              <td className="p-2.5 text-right font-mono font-bold">{o.targetQty}</td>
+                              <td className="p-2.5 font-bold"><span className={o.flStatus === 2 ? "text-green-600" : "text-rose-500"}>{o.flStatus === 2 ? "FIFO发料配齐" : "待发料"}</span></td>
+                              <td className="p-2.5 font-bold text-slate-600">{o.status === 1 ? "待发料" : o.status === 2 ? "设备返工运行中" : "已完工入库"}</td>
+                              <td className="p-2.5 text-center space-x-2">
+                                {o.status === 1 && <button onClick={() => handleFIFOIssue(o)} className="bg-orange-500 text-white font-bold px-2 py-1 rounded">FIFO发料</button>}
+                                {o.status === 2 && (
+                                  <>
+                                    <button onClick={() => {
+                                      setFeeds([{
+                                        id: `FD-${Date.now().toString().slice(-4)}`,
+                                        prodOrderCode: o.code,
+                                        feedTime: new Date().toLocaleString(),
+                                        stepNum: 1, stepDesc: "计量物理设备投料", note: "车间温湿度参数记录合格"
+                                      }, ...feeds]);
+                                      showToast("工艺参数记录成功！");
+                                    }} className="bg-indigo-600 text-white font-bold px-2 py-1 rounded">录入参数</button>
+                                    <button onClick={() => handleFinishProduction(o)} className="bg-emerald-600 text-white font-bold px-2 py-1 rounded">完工入库</button>
+                                  </>
+                                )}
+                                {o.status === 3 && <span className="text-slate-300">已结案</span>}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* === 5. 批次库存账册 === */}
+              {activeMenu === "batches" && (
+                <div className="bg-white rounded-xl border p-4">
+                  <span className="font-bold text-slate-800 text-sm block mb-3">物料批次与安全有效期控制账册</span>
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                        <th className="p-2.5">唯一批次号</th>
+                        <th className="p-2.5">物料</th>
+                        <th className="p-2.5">大类</th>
+                        <th className="p-2.5">生产期</th>
+                        <th className="p-2.5">有效期至</th>
+                        <th className="p-2.5 text-right">在库可用数</th>
+                        <th className="p-2.5">质检</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {batches.map(b => (
+                        <tr key={b.id} className="hover:bg-slate-50/50">
+                          <td className="p-2.5 font-mono font-bold text-slate-700">{b.batchNo}</td>
+                          <td className="p-2.5 font-bold text-slate-800">{b.materialName}</td>
+                          <td className="p-2.5">{b.type === 1 ? "采购回料" : "完工产出"}</td>
+                          <td className="p-2.5 font-mono text-slate-500">{b.mfgDate}</td>
+                          <td className="p-2.5 font-mono font-bold text-slate-600">{b.expDate}</td>
+                          <td className="p-2.5 text-right font-mono font-bold">{b.stockQty.toLocaleString()}</td>
+                          <td className="p-2.5 text-emerald-600 font-bold">● 合格放行</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* === 6. 申购需求单 === */}
+              {activeMenu === "requisitions" && (
+                <div className="bg-white rounded-xl border p-4">
+                  <span className="font-bold text-slate-800 text-sm block mb-1">MRP 深度用料缺口分析 (欠料行)</span>
+                  <table className="w-full text-left text-xs border-collapse mt-3">
+                    <thead>
+                      <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                        <th className="p-2.5">来源指令</th>
+                        <th className="p-2.5">缺口原料</th>
+                        <th className="p-2.5 text-right">投产需用</th>
+                        <th className="p-2.5 text-right">可用库存</th>
+                        <th className="p-2.5 text-right text-rose-600">计算缺口</th>
+                        <th className="p-2.5 text-center">流转命令</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {requisitions.length === 0 ? (
+                        <tr><td colSpan="6" className="py-6 text-center text-slate-400">目前物料充沛，暂无缺口。</td></tr>
+                      ) : (
+                        requisitions.map(r => (
+                          <tr key={r.id} className="hover:bg-slate-50/50">
+                            <td className="p-2.5 font-mono text-slate-500">{r.prodOrderCode}</td>
+                            <td className="p-2.5 font-bold text-slate-800">{r.materialName}</td>
+                            <td className="p-2.5 text-right font-mono">{r.needQty}</td>
+                            <td className="p-2.5 text-right font-mono">{r.stockQty}</td>
+                            <td className="p-2.5 text-right font-mono font-bold text-rose-600">{r.shortfall}</td>
+                            <td className="p-2.5 text-center">
+                              {r.status === 0 ? (
+                                <button onClick={() => handleAutoRequisition(r)} className="bg-indigo-600 text-white px-2 py-1 rounded font-bold text-[10px]">一键生成申购单</button>
+                              ) : <span className="text-slate-300 font-bold">已申购</span>}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* === 7. 采购/到货验收 === */}
+              {activeMenu === "purchases" && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl border p-4">
+                    <span className="font-bold text-slate-800 text-sm block mb-3">待下派采购单</span>
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                          <th className="p-2.5">合并申购单号</th>
+                          <th className="p-2.5">原料名称</th>
+                          <th className="p-2.5 text-right">申购需求量</th>
+                          <th className="p-2.5">当前状态</th>
+                          <th className="p-2.5 text-center">快捷下单</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {purchases.length === 0 ? (
+                          <tr><td colSpan="5" className="py-6 text-center text-slate-400">暂无申购信息</td></tr>
+                        ) : (
+                          purchases.map(p => (
+                            <tr key={p.id} className="hover:bg-slate-50/50">
+                              <td className="p-2.5 font-mono font-bold text-slate-700">{p.reqNo}</td>
+                              <td className="p-2.5 font-bold text-slate-800">{p.materialName}</td>
+                              <td className="p-2.5 text-right font-mono font-bold">{p.qty}</td>
+                              <td className="p-2.5 font-bold text-slate-500">{p.purStatus === 1 ? "等待下单" : p.purStatus === 2 ? "物流在途" : "已回料点收"}</td>
+                              <td className="p-2.5 text-center">
+                                {p.purStatus === 1 ? (
+                                  <button onClick={() => handleCreatePurchase(p)} className="bg-indigo-600 text-white text-[10px] px-2.5 py-1 rounded font-bold">下发采购单</button>
+                                ) : <span className="text-slate-300">指令已激活</span>}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="bg-white rounded-xl border p-4">
+                    <span className="font-bold text-slate-800 text-sm block mb-3">供应商到货点收与回料验收</span>
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b text-slate-500 font-bold">
+                          <th className="p-2.5">采购订单号</th>
+                          <th className="p-2.5">供应商</th>
+                          <th className="p-2.5">物料名称</th>
+                          <th className="p-2.5 text-right">采购总数</th>
+                          <th className="p-2.5 text-right text-emerald-600">实点验收数</th>
+                          <th className="p-2.5 text-center">点收动作</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {stockIns.length === 0 ? (
+                          <tr><td colSpan="6" className="py-6 text-center text-slate-400">暂无采购，请在上表合并下单</td></tr>
+                        ) : (
+                          stockIns.map(si => (
+                            <tr key={si.id} className="hover:bg-slate-50/50">
+                              <td className="p-2.5 font-mono font-bold text-slate-700">{si.poNo}</td>
+                              <td className="p-2.5 text-slate-500">{si.supplier}</td>
+                              <td className="p-2.5 font-bold text-slate-800">{si.materialName}</td>
+                              <td className="p-2.5 text-right font-mono">{si.qty}</td>
+                              <td className="p-2.5 text-right font-mono font-bold text-emerald-600">{si.rcvQty}</td>
+                              <td className="p-2.5 text-center">
+                                {si.status === 0 ? (
+                                  <button onClick={() => handleReceivePurchase(si)} className="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px]">回料质量点收</button>
+                                ) : <span className="text-slate-300">合格点收结案</span>}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+            </section>
+          </main>
+
+          {/* === 1. 新增物料弹窗 === */}
+          {showModal === "materialAdd" && (
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in">
+                <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
+                  <h3 className="font-bold text-slate-800 text-xs">登记新物料信息</h3>
+                  <button onClick={() => setShowModal(null)} className="text-slate-400 hover:text-slate-600"><Icon name="x" className="w-5 h-5" /></button>
+                </div>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.target);
+                  const code = fd.get("code");
+                  const name = fd.get("name");
+                  const type = fd.get("type");
+                  const unit = fd.get("unit");
+                  const bomOpt = fd.get("bomOpt");
+                  const chooseBomCode = fd.get("chooseBomCode");
+
+                  if (!code || !name) return;
+
+                  let finalBomCode = "";
+                  if (["配方", "配方产品", "中间品", "产品"].includes(type)) {
+                    if (bomOpt === "choose") finalBomCode = chooseBomCode;
+                  }
+
+                  const newMat = {
+                    id: `M${(materials.length + 1).toString().padStart(3, "0")}`,
+                    code, name, type, unit, status: 1, bomCode: finalBomCode
+                  };
+
+                  setMaterials([...materials, newMat]);
+                  setShowModal(null);
+                  showToast("新物料登记成功！");
+
+                  if (bomOpt === "new") {
+                    setTimeout(() => handleOpenBomWizard(code), 500);
+                  }
+                }} className="p-5 space-y-4 text-xs">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-bold text-slate-500 mb-1">大类物料编码 *</label>
+                      <input type="text" name="code" defaultValue={`MAT-NEW-${Date.now().toString().slice(-4)}`} className="w-full border rounded px-3 py-2 font-mono" />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-500 mb-1">类型分类</label>
+                      <select name="type" onChange={(e) => {
+                        const bomS = document.getElementById("bom_relation_section");
+                        if (["配方", "配方产品", "中间品", "产品"].includes(e.target.value)) {
+                          bomS?.classList.remove("hidden");
+                        } else {
+                          bomS?.classList.add("hidden");
+                        }
+                      }} className="w-full border rounded px-3 py-2 bg-white">
+                        {MATERIAL_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-500 mb-1">规格及名称 *</label>
+                    <input type="text" name="name" required placeholder="请输入..." className="w-full border rounded px-3 py-2" />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-500 mb-1">包装核算单位</label>
+                    <input type="text" name="unit" defaultValue="个" className="w-full border rounded px-3 py-1.5" />
+                  </div>
+
+                  <div id="bom_relation_section" className="border-t pt-3 space-y-2 hidden">
+                    <p className="font-bold text-indigo-700">关联与绑定工艺BOM配方</p>
+                    <div className="bg-indigo-50/50 p-3 rounded border border-indigo-100 space-y-2">
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-1 cursor-pointer"><input type="radio" name="bomOpt" value="none" defaultChecked /> <span>不绑定</span></label>
+                        <label className="flex items-center gap-1 cursor-pointer"><input type="radio" name="bomOpt" value="choose" /> <span>已有BOM</span></label>
+                        <label className="flex items-center gap-1 cursor-pointer text-indigo-700 font-bold"><input type="radio" name="bomOpt" value="new" /> <span>一键创建新BOM</span></label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 flex justify-end gap-2 border-t">
+                    <button type="button" onClick={() => setShowModal(null)} className="px-4 py-2 border rounded text-slate-500">取消</button>
+                    <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded font-bold">保存物料</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* === 2. 五合一级联BOM配置向导弹窗 === */}
+          {showModal === "bomWizard" && (
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in">
+                <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
+                  <h3 className="font-bold text-slate-800 text-xs">工艺BOM智能向导弹窗 (5合1联动配置)</h3>
+                  <button onClick={() => setShowModal(null)} className="text-slate-400 hover:text-slate-600"><Icon name="x" className="w-5 h-5" /></button>
+                </div>
+
+                <div className="bg-slate-100 p-2.5 border-b flex justify-around text-[10px] font-bold text-slate-400">
+                  <span className={wizardStep === 1 ? "text-indigo-600 border-b-2 border-indigo-600 font-extrabold pb-0.5" : ""}>1. 绑定物料成分与配比</span>
+                  <span className={wizardStep === 2 ? "text-indigo-600 border-b-2 border-indigo-600 font-extrabold pb-0.5" : ""}>2. 设定工艺步骤路线</span>
+                  <span className={wizardStep === 3 ? "text-indigo-600 border-b-2 border-indigo-600 font-extrabold pb-0.5" : ""}>3. 投料分配与中控参数指标</span>
+                </div>
+
+                <div className="p-5 min-h-[300px] max-h-[440px] overflow-y-auto text-xs space-y-4">
+                  {wizardStep === 1 && (
+                    <div className="space-y-4">
+                      <p className="font-bold text-indigo-700 bg-indigo-50 p-2 rounded">步骤 1/3: 设定大类对应配方（系统自动依据7大物料约束规则校验阻断）</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block font-bold text-slate-500 mb-1">工艺BOM名称 *</label>
+                          <input type="text" value={wizardBom.name} onChange={(e) => setWizardBom({ ...wizardBom, name: e.target.value })} placeholder="输入BOM名称..." className="w-full border rounded px-3 py-1.5" />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-500 mb-1">对应成品/半成品 *</label>
+                          <select value={wizardBom.materialCode} onChange={(e) => {
+                            const mat = materials.find(m => m.code === e.target.value);
+                            setWizardBom({ ...wizardBom, materialCode: e.target.value, type: mat ? mat.type : "产品", items: [] });
+                          }} className="w-full border rounded px-3 py-1.5 bg-white">
+                            <option value="">请选择物料</option>
+                            {materials.filter(m => ["配方", "配方产品", "中间品", "产品"].includes(m.type)).map(m => <option key={m.id} value={m.code}>{m.name} [{m.type}]</option>)}
+                          </select>
+                        </div>
+                      </div>
+
+                      {wizardBom.materialCode && (
+                        <div className="border p-3 rounded bg-slate-50">
+                          <span className="font-bold block mb-2 text-slate-700">配置投料比组成明细</span>
+                          <div className="flex gap-2">
+                            <select id="wizard_item_select" className="border rounded bg-white flex-1 p-1">
+                              <option value="">添加组成物料</option>
+                              {getAvailableSubMaterials(wizardBom.type).map(m => <option key={m.id} value={m.code}>{m.name} ({m.code})</option>)}
+                            </select>
+                            <input type="number" id="wizard_item_ratio" placeholder="占比 (%)" className="border rounded w-24 p-1" />
+                            <button type="button" onClick={() => {
+                              const sel = document.getElementById("wizard_item_select");
+                              const rat = document.getElementById("wizard_item_ratio");
+                              if (!sel.value || !rat.value) return;
+                              const matchedM = materials.find(m => m.code === sel.value);
+                              setWizardBom({
+                                ...wizardBom,
+                                items: [...wizardBom.items, { materialCode: sel.value, materialName: matchedM.name, type: matchedM.type, ratio: parseFloat(rat.value) }]
+                              });
+                              sel.value = ""; rat.value = "";
+                            }} className="bg-indigo-600 text-white px-3 py-1 rounded">加入</button>
+                          </div>
+
+                          <table className="w-full text-left text-xs bg-white border mt-3">
+                            <thead>
+                              <tr className="bg-slate-100 border-b text-slate-500 font-bold"><th className="p-1.5 pl-3">规格原料</th><th className="p-1.5 text-right">配比占比</th><th className="p-1.5 text-center">操作</th></tr>
+                            </thead>
+                            <tbody>
+                              {wizardBom.items.map((it, idx) => (
+                                <tr key={idx} className="border-b"><td className="p-1.5 pl-3 font-bold">{it.materialName}</td><td className="p-1.5 text-right font-mono">{it.ratio}%</td><td className="p-1.5 text-center"><button type="button" onClick={() => setWizardBom({ ...wizardBom, items: wizardBom.items.filter((_, i) => i !== idx) })} className="text-rose-600">删除</button></td></tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {wizardStep === 2 && (
+                    <div className="space-y-4">
+                      <p className="font-bold text-indigo-700 bg-indigo-50 p-2 rounded">步骤 2/3: 规划工序步骤路线 (点击移除并排序)</p>
+                      <div className="flex gap-2">
+                        <input type="text" id="wizard_step_desc" placeholder="输入工艺步骤(如：恒温高剪切乳化)..." className="border rounded flex-1 p-2" />
+                        <button type="button" onClick={() => {
+                          const descE = document.getElementById("wizard_step_desc");
+                          if (!descE.value) return;
+                          setWizardBom({ ...wizardBom, steps: [...wizardBom.steps, { stepNum: wizardBom.steps.length + 1, desc: descE.value }] });
+                          descE.value = "";
+                        }} className="bg-indigo-600 text-white font-bold px-4 py-2 rounded">加入工步</button>
+                      </div>
+
+                      <div className="space-y-1.5 mt-2">
+                        {wizardBom.steps.map((st, idx) => (
+                          <div key={idx} className="bg-slate-50 border p-2 rounded flex justify-between items-center">
+                            <span className="font-bold">工步 #{st.stepNum}: {st.desc}</span>
+                            <button type="button" onClick={() => {
+                              const remaining = wizardBom.steps.filter((_, i) => i !== idx).map((s, i) => ({ ...s, stepNum: i + 1 }));
+                              setWizardBom({ ...wizardBom, steps: remaining });
+                            }} className="text-rose-500 font-bold">移除</button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {wizardStep === 3 && (
+                    <div className="space-y-4">
+                      <p className="font-bold text-indigo-700 bg-indigo-50 p-2 rounded">步骤 3/3: 步骤投料明细分配 & 工艺中控指标指标</p>
+                      
+                      <div className="border p-3 rounded bg-slate-50 space-y-2">
+                        <span className="font-bold text-slate-700 block text-xs">1. 投料分配 (物料在哪个工步投入)</span>
+                        <div className="flex gap-2">
+                          <select id="wizard_map_step" className="border rounded bg-white p-1">
+                            {wizardBom.steps.map(s => <option key={s.stepNum} value={s.stepNum}>步骤 {s.stepNum}</option>)}
+                          </select>
+                          <select id="wizard_map_item" className="border rounded bg-white p-1 flex-1">
+                            {wizardBom.items.map((it, idx) => <option key={idx} value={it.materialCode}>{it.materialName}</option>)}
+                          </select>
+                          <button type="button" onClick={() => {
+                            const st = document.getElementById("wizard_map_step");
+                            const it = document.getElementById("wizard_map_item");
+                            if (!st.value || !it.value) return;
+                            const matched = materials.find(m => m.code === it.value);
+                            setWizardBom({
+                              ...wizardBom,
+                              stepFeeds: [...wizardBom.stepFeeds, { stepNum: Number(st.value), materialCode: it.value, materialName: matched.name }]
+                            });
+                          }} className="bg-indigo-600 text-white px-3 py-1 rounded">确认分配</button>
+                        </div>
+                        <div className="flex gap-1.5 flex-wrap bg-white border p-2 rounded min-h-[36px]">
+                          {wizardBom.stepFeeds.map((f, i) => (
+                            <span key={i} className="bg-indigo-50 text-indigo-800 text-[10px] px-1.5 py-0.5 rounded border border-indigo-100 flex items-center gap-0.5">
+                              <span>【步{f.stepNum}】{f.materialName}</span>
+                              <span onClick={() => setWizardBom({ ...wizardBom, stepFeeds: wizardBom.stepFeeds.filter((_, idx) => idx !== i) })} className="text-slate-400 hover:text-red-600 font-bold ml-1 cursor-pointer">×</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border p-3 rounded bg-slate-50 space-y-2">
+                        <span className="font-bold text-slate-700 block text-xs">2. 监控控制标准指标 (搅拌转速/压力/真空度/定量灌装值)</span>
+                        <div className="grid grid-cols-4 gap-2">
+                          <select id="wizard_param_step" className="border rounded bg-white p-1 text-[11px]"><option value="1">工序 #1</option><option value="2">工序 #2</option></select>
+                          <input type="text" id="wizard_param_name" placeholder="参数名" className="border rounded p-1 text-[11px]" />
+                          <input type="text" id="wizard_param_val" placeholder="标准值" className="border rounded p-1 text-[11px]" />
+                          <button type="button" onClick={() => {
+                            const step = document.getElementById("wizard_param_step");
+                            const name = document.getElementById("wizard_param_name");
+                            const val = document.getElementById("wizard_param_val");
+                            if (!name.value || !val.value) return;
+                            setWizardBom({
+                              ...wizardBom,
+                              params: [...wizardBom.params, { stepNum: Number(step.value), name: name.value, planVal: val.value, unit: "r/min", minVal: val.value, maxVal: val.value }]
+                            });
+                            name.value = ""; val.value = "";
+                          }} className="bg-indigo-600 text-white px-3 py-1 rounded">加入控制</button>
+                        </div>
+                        <div className="bg-white border text-[10px] max-h-24 overflow-y-auto no-scrollbar">
+                          {wizardBom.params.map((pm, i) => (
+                            <div key={i} className="p-1 px-2 border-b flex justify-between font-bold">
+                              <span>【步{pm.stepNum}】 {pm.name}</span>
+                              <span className="text-indigo-600">{pm.planVal} {pm.unit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 bg-slate-50 border-t flex justify-between items-center text-xs">
+                  <button type="button" disabled={wizardStep === 1} onClick={() => setWizardStep(prev => prev - 1)} className="px-4 py-1.5 border rounded">上一步</button>
+                  {wizardStep < 3 ? (
+                    <button type="button" onClick={() => {
+                      if (wizardStep === 1 && (!wizardBom.name || !wizardBom.materialCode || wizardBom.items.length === 0)) {
+                        alert("请完整填写BOM主属性及明细！"); return;
+                      }
+                      setWizardStep(prev => prev + 1);
+                    }} className="bg-indigo-600 text-white px-4 py-1.5 rounded font-bold">下一步</button>
+                  ) : (
+                    <button type="button" onClick={() => {
+                      if (wizardBom.items.length === 0 || wizardBom.steps.length === 0 || wizardBom.stepFeeds.length === 0) {
+                        alert("五合一强校验：BOM配比、工艺路线、投料明细缺一不可！请完善配置后再提交保存！"); return;
+                      }
+
+                      const newBId = `B00${boms.length + 1}`;
+                      const newB = { id: newBId, code: wizardBom.code, name: wizardBom.name, materialCode: wizardBom.materialCode, type: wizardBom.type, version: wizardBom.version, status: 1 };
+                      
+                      setBoms([...boms, newB]);
+                      setBomItems([...bomItems, ...wizardBom.items.map((it, idx) => ({ id: `BI${Date.now()}-${idx}`, bomId: newBId, materialCode: it.materialCode, materialName: it.materialName, ratio: it.ratio, type: it.type }))]);
+                      setBomSteps([...bomSteps, ...wizardBom.steps.map((st, idx) => ({ id: `BS${Date.now()}-${idx}`, bomId: newBId, stepNum: st.stepNum, desc: st.desc }))]);
+                      setBomStepFeeds([...bomStepFeeds, ...wizardBom.stepFeeds.map((fd, idx) => ({ id: `BF${Date.now()}-${idx}`, bomId: newBId, stepNum: fd.stepNum, materialCode: fd.materialCode, materialName: fd.materialName }))]);
+                      setBomParams([...bomParams, ...wizardBom.params.map((pm, idx) => ({ id: `BP${Date.now()}-${idx}`, stepId: `BS${Date.now()}-0`, name: pm.name, planVal: pm.planVal, unit: pm.unit, minVal: pm.minVal, maxVal: pm.maxVal }))]);
+
+                      if (autoBindMaterialCode) {
+                        setMaterials(materials.map(m => m.code === autoBindMaterialCode ? { ...m, bomCode: wizardBom.code } : m));
+                      }
+
+                      setShowModal(null);
+                      setSelectedBom(newB);
+                      showToast(`五合一智能级联BOM ${wizardBom.code} 创建成功，并自动绑定回填至当前物料！`);
+                      setActiveMenu("boms");
+                    }} className="bg-emerald-600 text-white px-5 py-1.5 rounded font-bold">配置完整并保存</button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<App />);
+  </script>
+</body>
+</html>
