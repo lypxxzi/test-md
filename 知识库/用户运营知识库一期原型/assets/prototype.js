@@ -65,12 +65,16 @@ function initPrototype(config = {}) {
   });
 }
 
+function showCitations() {
+  document.getElementById('chatLayout')?.classList.remove('no-reference');
+  document.getElementById('referencePanel')?.classList.remove('is-hidden');
+  toast('已展开引用来源');
+}
+
 function sendMockMessage() {
   const input = document.getElementById('chatText');
   const list = document.getElementById('messageArea');
   const empty = document.getElementById('chatEmpty');
-  const references = document.getElementById('referenceList');
-  const referenceEmpty = document.getElementById('referenceEmpty');
   if (!input || !list || !input.value.trim()) return;
   if (empty) empty.classList.add('is-hidden');
   const user = document.createElement('div');
@@ -80,11 +84,10 @@ function sendMockMessage() {
   input.value = '';
   const ai = document.createElement('div');
   ai.className = 'bubble ai';
-  ai.innerHTML = '根据当前选择的 <b>用户知识库</b>，系统命中了《面霜A工艺标准》。乳化搅拌温度建议控制在 <b>60-65℃</b>，搅拌完成后需静置脱泡 15 分钟。<div class="hint" style="margin-top:8px">引用来源：面霜A工艺标准.pdf / 第3页；本次消耗 1,280 token</div>';
+  const activeType = document.querySelector('[data-chat-type].active')?.textContent.trim() || '问公司文件';
+  ai.innerHTML = `根据本轮选择的 <b>${activeType}</b>，乳化搅拌温度建议控制在 <b>60-65℃</b>，搅拌完成后需静置脱泡 15 分钟。<div class="hint" style="margin-top:8px">本次消耗 1,280 token <button class="citation-btn" onclick="showCitations()">引用来源</button></div>`;
   setTimeout(() => {
     list.appendChild(ai);
-    if (referenceEmpty) referenceEmpty.classList.add('is-hidden');
-    if (references) references.classList.remove('is-hidden');
     list.scrollTop = list.scrollHeight;
     toast('AI 回复已生成，token 已计入公司月汇总');
   }, 360);
