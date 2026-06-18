@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>用户知识库问答</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" data-menu="chat" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">用户知识库问答 ×</button></div><div class="user-actions">剩余额度 31,580 token <span class="avatar"></span></div></div>
+    <div class="toolbar"><div class="toolbar-left"><button class="primary-btn" data-toast="已新建会话">＋ 新建会话</button><div class="pill-tabs"><button class="active">问公司文件</button><button>问系统使用</button></div></div><div class="toolbar-right"><button class="ghost-btn" data-open="scopeDrawer">检索范围：我有权限的文件</button></div></div>
+    <div class="chat-layout">
+      <div class="conversation-list"><div class="card-title"><h3>会话列表</h3></div><div class="conversation-item active">面霜A搅拌温度</div><div class="conversation-item">洁面乳检验标准</div><div class="conversation-item">包装喷码要求</div></div>
+      <div class="chat-main"><div class="message-area" id="messageArea"><div class="bubble user">面霜A的搅拌温度是多少？</div><div class="bubble ai">根据《面霜A工艺标准》，乳化搅拌温度建议控制在 <b>60-65℃</b>。<div class="hint" style="margin-top:8px">引用来源：用户知识库 / 面霜A工艺标准.pdf / 第3页；本次消耗 1,280 token</div></div></div><div class="chat-input"><textarea class="input" id="chatText" placeholder="输入问题，系统只会检索你有权限查看的用户知识库文件"></textarea><button class="primary-btn" onclick="sendMockMessage()">发送</button></div></div>
+      <div class="reference-panel"><div class="card-title"><h3>引用来源</h3><span class="hint">Top 3</span></div><div style="padding:12px"><div class="reference-card"><b>面霜A工艺标准.pdf</b><p>第3页：乳化温度控制在60-65℃，转速120r/min。</p><span class="badge info">相似度 0.86</span></div><div class="reference-card"><b>乳化工序SOP.docx</b><p>第2节：温度偏差超过3℃时需记录偏差。</p><span class="badge info">相似度 0.79</span></div><div class="reference-card"><b>内控检验方法.docx</b><p>第5节：搅拌完成后静置脱泡15分钟。</p><span class="badge info">相似度 0.73</span></div></div></div>
+    </div>
+  </main>
+</div>
+<div class="drawer-mask" id="scopeDrawer"><div class="drawer"><div class="drawer-head"><b>本次检索范围</b><button class="icon-btn" data-close>×</button></div><div class="drawer-body"><ul class="subtle-list"><li>公司：麦德臻好供应链(广州)有限公司</li><li>知识库类型：用户知识库</li><li>文档状态：处理成功</li><li>删除状态：未删除</li><li>权限：当前用户可见文档</li></ul></div><div class="drawer-foot"><button class="primary-btn" data-close>知道了</button></div></div></div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'chat' })</script>
+</body></html>

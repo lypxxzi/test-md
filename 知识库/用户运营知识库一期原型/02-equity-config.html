@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>权益配置</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" data-menu="equity" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">权益配置 ×</button></div><div class="user-actions">平台管理员 <span class="avatar"></span></div></div>
+    <div class="toolbar"><div class="toolbar-left"><select class="select"><option>麦德臻好供应链(广州)有限公司</option></select><button class="ghost-btn">读取当前配置</button></div><button class="primary-btn" data-toast="权益配置已保存">保存配置</button></div>
+    <div class="grid cols-3">
+      <div class="metric"><div class="label">本月Token已用</div><div class="value">68,420</div><div class="progress"><span style="width:68%"></span></div><div class="hint">上限 100,000</div></div>
+      <div class="metric"><div class="label">存储已用</div><div class="value">1.8 GB</div><div class="progress"><span style="width:36%"></span></div><div class="hint">上限 5 GB</div></div>
+      <div class="metric"><div class="label">AI状态</div><div class="value" style="color:#16a34a">已启用</div><div class="hint">用户知识库、运营知识库可分别开关。</div></div>
+    </div>
+    <div class="card pad" style="margin-top:14px">
+      <h2>公司AI权益</h2>
+      <div class="form-grid" style="margin-top:18px">
+        <div class="field-label">AI应用总开关</div><label class="switch"><input type="checkbox" checked><span></span></label>
+        <div class="field-label">用户知识库</div><label class="switch"><input type="checkbox" checked><span></span></label>
+        <div class="field-label">运营知识库</div><label class="switch"><input type="checkbox" checked><span></span></label>
+        <div class="field-label">总容量上限</div><div><input class="input" value="5120"> <span class="hint">MB，0表示不限制</span></div>
+        <div class="field-label">单文件大小上限</div><div><input class="input" value="50"> <span class="hint">MB，只限制 PDF / DOCX 上传</span></div>
+        <div class="field-label">公司月Token上限</div><div><input class="input" value="100000"> <span class="hint">两个Agent共用公司全局Token池</span></div>
+        <div class="field-label">超限提示语</div><textarea class="textarea">本公司本月 AI token 额度已用完，请联系管理员调整权益配置。</textarea>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'equity' })</script>
+</body></html>

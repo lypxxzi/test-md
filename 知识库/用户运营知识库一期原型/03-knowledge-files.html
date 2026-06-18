@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>知识库文件</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" data-menu="files" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">知识库文件 ×</button><button class="page-tab">知识库分类 ×</button></div><div class="user-actions">麦德臻好供应链(广州)有限公司 <span class="avatar"></span></div></div>
+    <div class="toolbar">
+      <div class="toolbar-left"><button class="primary-btn" data-open="uploadModal">＋ 新增文件</button><button class="ghost-btn" data-toast="已刷新文件处理状态">刷新状态</button></div>
+      <div class="toolbar-right"><select class="select"><option>全部状态</option><option>处理中</option><option>成功</option><option>失败</option></select><input class="search" data-filter placeholder="文件编号/文件名/负责人"></div>
+    </div>
+    <div class="card">
+      <table class="table">
+        <thead><tr><th><input type="checkbox"></th><th>文件编号</th><th>文件名</th><th>分类</th><th>文件大小</th><th>上传人</th><th>上传时间</th><th>AI处理状态</th><th style="text-align:right">操作</th></tr></thead>
+        <tbody>
+          <tr data-filter-row><td><input type="checkbox"></td><td>ZSKWJ20260617003</td><td>面霜A工艺标准.pdf</td><td>工艺标准</td><td>2.4MB</td><td>李艳萍</td><td>2026/06/17 10:20</td><td><span class="badge ok">成功，可检索</span></td><td><div class="row-actions"><span data-open="detailDrawer">查看</span><span data-open="permissionDrawer">权限</span><span>下载</span><span data-toast="文件已移入删除区">删除</span></div></td></tr>
+          <tr data-filter-row><td><input type="checkbox"></td><td>ZSKWJ20260617002</td><td>洁面乳内控说明.docx</td><td>内控资料</td><td>1.1MB</td><td>王敏</td><td>2026/06/17 09:44</td><td><span class="badge warn">处理中 65%</span></td><td><div class="row-actions"><span data-open="detailDrawer">查看</span><span data-open="permissionDrawer">权限</span><span>下载</span><span>删除</span></div></td></tr>
+          <tr data-filter-row><td><input type="checkbox"></td><td>ZSKWJ20260616008</td><td>扫描版配方记录.pdf</td><td>研发资料</td><td>8.7MB</td><td>周晨</td><td>2026/06/16 16:10</td><td><span class="badge fail">失败：扫描件暂不支持</span></td><td><div class="row-actions"><span data-toast="已重新提交处理队列">重试</span><span data-open="detailDrawer">查看</span><span>删除</span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="footer-page">共 3 条 <span>‹</span><button class="primary-btn">1</button><span>›</span><select class="select"><option>20条/页</option></select></div>
+  </main>
+</div>
+<div class="modal-mask" id="uploadModal"><div class="modal large"><div class="modal-head"><b>新增知识库文件</b><button class="icon-btn" data-close>×</button></div><div class="modal-body"><div class="steps"><div class="step active">1. 上传文件</div><div class="step active">2. 设置分类</div><div class="step">3. 设置可见范围</div><div class="step">4. 自动处理</div></div><div class="dropzone"><b>点击或拖拽 PDF / DOCX 到这里上传</b><br><span class="hint">单文件不超过 50MB；上传后自动解析、切片、向量化。</span></div><div class="form-grid" style="margin-top:16px"><div class="field-label">文件分类</div><select class="input"><option>工艺标准</option><option>内控资料</option><option>研发资料</option></select><div class="field-label">可见范围</div><select class="input"><option>全公司可见</option><option>仅自己可见</option><option>指定用户分组</option></select><div class="field-label">负责人</div><input class="input" value="李艳萍"></div></div><div class="modal-foot"><button class="ghost-btn" data-close>取消</button><button class="primary-btn" data-close data-toast="文件已上传，进入处理中">确认上传</button></div></div></div>
+<div class="drawer-mask" id="detailDrawer"><div class="drawer"><div class="drawer-head"><b>文件处理详情</b><button class="icon-btn" data-close>×</button></div><div class="drawer-body"><div class="metric"><div class="label">处理进度</div><div class="value">成功</div><div class="progress"><span style="width:100%"></span></div></div><ul class="subtle-list"><li>原文件：面霜A工艺标准.pdf</li><li>解析文本：已生成</li><li>切片数量：28</li><li>向量写入：28/28</li><li>引用预览：第3页“乳化温度控制在60-65℃”</li></ul></div><div class="drawer-foot"><button class="primary-btn" data-close>知道了</button></div></div></div>
+<div class="drawer-mask" id="permissionDrawer"><div class="drawer"><div class="drawer-head"><b>修改可见范围</b><button class="icon-btn" data-close>×</button></div><div class="drawer-body"><div class="hint">权限变更后，下次AI检索立即按最新可见范围生效。</div><div class="form-grid" style="margin-top:16px"><div class="field-label">可见范围</div><select class="input"><option>全公司可见</option><option>仅自己可见</option><option>指定用户</option><option>指定用户分组</option></select><div class="field-label">用户分组</div><select class="input"><option>研发中心</option><option>质量部</option></select></div></div><div class="drawer-foot"><button class="ghost-btn" data-close>取消</button><button class="primary-btn" data-close data-toast="可见范围已更新">保存</button></div></div></div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'files' })</script>
+</body></html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>知识库分类</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" data-menu="category" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">知识库分类 ×</button></div><div class="user-actions">麦德臻好供应链(广州)有限公司 <span class="avatar"></span></div></div>
+    <div class="toolbar"><div class="toolbar-left"><button class="primary-btn" data-open="categoryModal">＋ 新增分类</button></div><div class="toolbar-right"><input class="search" data-filter placeholder="分类名称/负责人"></div></div>
+    <div class="card">
+      <table class="table"><thead><tr><th>分类编码</th><th>分类名称</th><th>说明</th><th>文件数</th><th>状态</th><th>负责人</th><th style="text-align:right">操作</th></tr></thead><tbody>
+        <tr data-filter-row><td>KB-CAT-001</td><td>工艺标准</td><td>生产工艺、参数、标准操作文件</td><td>18</td><td><span class="badge ok">启用</span></td><td>李艳萍</td><td><div class="row-actions"><span data-open="categoryModal">编辑</span><span data-toast="已有文件使用，不能删除">删除</span></div></td></tr>
+        <tr data-filter-row><td>KB-CAT-002</td><td>内控资料</td><td>质量内控、检验方法、放行规则</td><td>9</td><td><span class="badge ok">启用</span></td><td>王敏</td><td><div class="row-actions"><span data-open="categoryModal">编辑</span><span data-toast="已有文件使用，不能删除">删除</span></div></td></tr>
+        <tr data-filter-row><td>KB-CAT-003</td><td>研发资料</td><td>研发记录、配方试验说明</td><td>0</td><td><span class="badge warn">停用</span></td><td>周晨</td><td><div class="row-actions"><span data-open="categoryModal">编辑</span><span data-toast="分类已删除">删除</span></div></td></tr>
+      </tbody></table>
+    </div>
+  </main>
+</div>
+<div class="modal-mask" id="categoryModal"><div class="modal"><div class="modal-head"><b>维护知识库分类</b><button class="icon-btn" data-close>×</button></div><div class="modal-body"><div class="form-grid"><div class="field-label">分类名称</div><input class="input" value="工艺标准"><div class="field-label">分类说明</div><textarea class="textarea">生产工艺、参数、标准操作文件</textarea><div class="field-label">状态</div><select class="input"><option>启用</option><option>停用</option></select></div></div><div class="modal-foot"><button class="ghost-btn" data-close>取消</button><button class="primary-btn" data-close data-toast="分类已保存">保存</button></div></div></div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'category' })</script>
+</body></html>

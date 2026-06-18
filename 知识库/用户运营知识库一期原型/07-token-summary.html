@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Token月汇总</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" data-menu="token" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">Token月汇总 ×</button></div><div class="user-actions">公司全局额度 <span class="avatar"></span></div></div>
+    <div class="grid cols-3">
+      <div class="metric"><div class="label">2026-06已用Token</div><div class="value">68,420</div><div class="progress"><span style="width:68%"></span></div><div class="hint">两个Agent共用公司月额度。</div></div>
+      <div class="metric"><div class="label">月上限</div><div class="value">100,000</div><div class="hint">来自权益配置表。</div></div>
+      <div class="metric"><div class="label">剩余额度</div><div class="value" style="color:#16a34a">31,580</div><div class="hint">提问前查汇总表判断是否可继续。</div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="card-title"><h3>公司Token月汇总</h3><div class="toolbar-right"><select class="select"><option>2026-06</option><option>2026-05</option></select></div></div>
+      <table class="table"><thead><tr><th>公司</th><th>统计月份</th><th>累计Token</th><th>AI回复次数</th><th>月上限</th><th>状态</th><th>更新时间</th></tr></thead><tbody>
+        <tr><td>麦德臻好供应链(广州)有限公司</td><td>2026-06</td><td>68,420</td><td>126</td><td>100,000</td><td><span class="badge ok">可继续使用</span></td><td>2026/06/17 10:30</td></tr>
+        <tr><td>广州示例化妆品有限公司</td><td>2026-06</td><td>98,900</td><td>241</td><td>100,000</td><td><span class="badge warn">接近上限</span></td><td>2026/06/17 10:28</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card pad" style="margin-top:14px"><h3>一期口径</h3><ul class="subtle-list"><li>消息表保存单条AI回复的 token_count，用于追溯。</li><li>汇总表只做公司 + 月份的全局累计，用于额度判断。</li><li>用户知识库和运营知识库共用公司 token 池，不按Agent拆额度。</li><li>聊天记录删除不回滚已消耗 token。</li></ul></div>
+  </main>
+</div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'token' })</script>
+</body></html>
