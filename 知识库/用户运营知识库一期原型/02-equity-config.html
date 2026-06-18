@@ -7,11 +7,11 @@
   <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" data-menu="equity" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
   <main class="page">
     <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">权益配置 ×</button></div><div class="user-actions">平台管理员 <span class="avatar"></span></div></div>
-    <div class="toolbar"><div class="toolbar-left"><select class="select"><option>麦德臻好供应链(广州)有限公司</option></select><button class="ghost-btn">读取当前配置</button></div><button class="primary-btn" data-toast="权益配置已保存">保存配置</button></div>
+    <div class="toolbar"><div class="toolbar-left"><select class="select"><option>麦德臻好供应链(广州)有限公司</option></select><button class="ghost-btn" data-toast="当前公司暂无历史配置">读取当前配置</button></div><button class="primary-btn" data-show-target="equitySaved" data-toast="权益配置已保存">保存配置</button></div>
     <div class="grid cols-3">
-      <div class="metric"><div class="label">本月Token已用</div><div class="value">68,420</div><div class="progress"><span style="width:68%"></span></div><div class="hint">上限 100,000</div></div>
-      <div class="metric"><div class="label">存储已用</div><div class="value">1.8 GB</div><div class="progress"><span style="width:36%"></span></div><div class="hint">上限 5 GB</div></div>
-      <div class="metric"><div class="label">AI状态</div><div class="value" style="color:#16a34a">已启用</div><div class="hint">用户知识库、运营知识库可分别开关。</div></div>
+      <div class="metric"><div class="label">本月Token已用</div><div class="value">0</div><div class="progress"><span style="width:0%"></span></div><div class="hint">新启用公司初始为0。</div></div>
+      <div class="metric"><div class="label">存储已用</div><div class="value">0 MB</div><div class="progress"><span style="width:0%"></span></div><div class="hint">上传文件后累计容量。</div></div>
+      <div class="metric"><div class="label">AI状态</div><div class="value" style="color:#f59e0b">待保存</div><div class="hint">保存后权益立即生效。</div></div>
     </div>
     <div class="card pad" style="margin-top:14px">
       <h2>公司AI权益</h2>
@@ -24,6 +24,10 @@
         <div class="field-label">公司月Token上限</div><div><input class="input" value="100000"> <span class="hint">两个Agent共用公司全局Token池</span></div>
         <div class="field-label">超限提示语</div><textarea class="textarea">本公司本月 AI token 额度已用完，请联系管理员调整权益配置。</textarea>
       </div>
+    </div>
+    <div class="card pad is-hidden" id="equitySaved" style="margin-top:14px">
+      <div class="status-line"><span class="status-dot ok"></span><b>配置已生效</b></div>
+      <ul class="subtle-list"><li>上传校验：总容量 5120MB，单文件 50MB。</li><li>提问校验：公司月Token上限 100000。</li><li>两个Agent共用公司Token池，不单独拆额度。</li></ul>
     </div>
   </main>
 </div>

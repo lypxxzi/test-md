@@ -36,6 +36,12 @@ function initPrototype(config = {}) {
   document.querySelectorAll('[data-toast]').forEach(btn => {
     btn.addEventListener('click', () => toast(btn.dataset.toast));
   });
+  document.querySelectorAll('[data-show-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.dataset.hideTarget?.split(',').forEach(id => document.getElementById(id.trim())?.classList.add('is-hidden'));
+      btn.dataset.showTarget.split(',').forEach(id => document.getElementById(id.trim())?.classList.remove('is-hidden'));
+    });
+  });
   document.querySelectorAll('[data-filter]').forEach(input => {
     input.addEventListener('input', () => filterTable(input));
   });
@@ -46,12 +52,27 @@ function initPrototype(config = {}) {
       toast(`已切换到：${btn.textContent.trim()}`);
     });
   });
+  document.querySelectorAll('[data-chat-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-chat-type]').forEach(item => item.classList.remove('active'));
+      btn.classList.add('active');
+      const label = document.getElementById('activeChatType');
+      const scope = document.getElementById('activeScope');
+      if (label) label.textContent = btn.dataset.chatType === 'USER_KB' ? '用户知识库' : '运营知识库';
+      if (scope) scope.textContent = btn.dataset.chatType === 'USER_KB' ? '仅检索当前用户有权限的公司文件' : '检索平台维护的系统操作说明';
+      toast(`本轮对话将使用：${btn.textContent.trim()}`);
+    });
+  });
 }
 
 function sendMockMessage() {
   const input = document.getElementById('chatText');
   const list = document.getElementById('messageArea');
+  const empty = document.getElementById('chatEmpty');
+  const references = document.getElementById('referenceList');
+  const referenceEmpty = document.getElementById('referenceEmpty');
   if (!input || !list || !input.value.trim()) return;
+  if (empty) empty.classList.add('is-hidden');
   const user = document.createElement('div');
   user.className = 'bubble user';
   user.textContent = input.value.trim();
@@ -59,9 +80,11 @@ function sendMockMessage() {
   input.value = '';
   const ai = document.createElement('div');
   ai.className = 'bubble ai';
-  ai.innerHTML = '根据《面霜A工艺标准》，乳化搅拌温度建议控制在 <b>60-65℃</b>，搅拌完成后需静置脱泡 15 分钟。<div class="hint" style="margin-top:8px">引用来源：用户知识库 / 面霜A工艺标准.pdf / 第3页</div>';
+  ai.innerHTML = '根据当前选择的 <b>用户知识库</b>，系统命中了《面霜A工艺标准》。乳化搅拌温度建议控制在 <b>60-65℃</b>，搅拌完成后需静置脱泡 15 分钟。<div class="hint" style="margin-top:8px">引用来源：面霜A工艺标准.pdf / 第3页；本次消耗 1,280 token</div>';
   setTimeout(() => {
     list.appendChild(ai);
+    if (referenceEmpty) referenceEmpty.classList.add('is-hidden');
+    if (references) references.classList.remove('is-hidden');
     list.scrollTop = list.scrollHeight;
     toast('AI 回复已生成，token 已计入公司月汇总');
   }, 360);

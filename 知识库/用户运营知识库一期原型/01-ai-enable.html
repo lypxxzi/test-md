@@ -12,7 +12,7 @@
       <div class="metric"><div class="label">适用范围</div><div class="value">公司级</div><div class="hint">启用后公司内具备AI权限的用户可使用。</div></div>
       <div class="metric"><div class="label">确认版本</div><div class="value">V1.0</div><div class="hint">免责声明和使用说明版本会被记录。</div></div>
     </div>
-    <div class="card pad" style="margin-top:14px">
+    <div class="card pad" style="margin-top:14px" id="enableBefore">
       <h2>启用前确认</h2>
       <div class="steps"><div class="step active">1. 管理员身份校验</div><div class="step active">2. 阅读功能说明</div><div class="step">3. 勾选免责声明</div><div class="step">4. 启用成功</div></div>
       <div class="grid cols-2">
@@ -20,7 +20,13 @@
         <div class="card pad"><h3>风险提示</h3><ul class="subtle-list"><li>AI回答可能不准确，仅作辅助参考。</li><li>文件查看/下载权限不等于AI检索权限。</li><li>敏感文件不建议上传到知识库。</li></ul></div>
       </div>
       <label style="display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:13px"><input type="checkbox" checked>我已阅读并同意《AI 知识库使用免责声明》，确认仅上传适合公司内部 AI 检索的文件。</label>
-      <div style="margin-top:18px;display:flex;gap:10px"><button class="primary-btn" data-toast="AI知识库已启用">同意并启用</button><button class="ghost-btn">暂不启用</button></div>
+      <div style="margin-top:18px;display:flex;gap:10px"><button class="primary-btn" data-show-target="enableAfter" data-hide-target="enableBefore" data-toast="AI知识库已启用">同意并启用</button><button class="ghost-btn">暂不启用</button></div>
+    </div>
+    <div class="card pad is-hidden" id="enableAfter" style="margin-top:14px">
+      <div class="status-line"><span class="status-dot ok"></span><b>AI知识库已启用</b></div>
+      <div class="steps"><div class="step active">1. 管理员确认</div><div class="step active">2. 公司权益生效</div><div class="step active">3. 用户可进入问答</div></div>
+      <ul class="subtle-list"><li>启用人：李艳萍</li><li>启用范围：当前公司</li><li>下一步：到“知识库文件”上传第一份文件，处理成功后即可问答。</li></ul>
+      <div style="margin-top:16px"><a class="primary-btn" href="03-knowledge-files.html">去上传文件</a></div>
     </div>
   </main>
 </div>
