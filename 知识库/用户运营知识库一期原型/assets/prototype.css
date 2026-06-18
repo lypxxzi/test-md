@@ -109,6 +109,10 @@ button { cursor: pointer; }
 .bubble { max-width: 76%; padding: 12px 14px; border-radius: 12px; margin-bottom: 14px; font-size: 14px; line-height: 1.65; }
 .bubble.user { margin-left: auto; background: var(--primary); color: #fff; border-bottom-right-radius: 3px; }
 .bubble.ai { background: #f2f5fb; color: #323a4d; border-bottom-left-radius: 3px; }
+.bubble-actions { display: flex; gap: 12px; margin-top: 10px; font-size: 12px; }
+.bubble-actions button { border: 0; background: transparent; color: var(--primary); padding: 0; cursor: pointer; }
+.follow-up-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.follow-up-list button { border: 1px solid #dfe4f2; background: #fff; color: #596174; border-radius: 999px; height: 26px; padding: 0 10px; font-size: 12px; }
 .chat-input { padding: 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
 .chat-input-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .chat-input-main { display: flex; gap: 8px; }

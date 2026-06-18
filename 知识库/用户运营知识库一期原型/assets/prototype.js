@@ -71,6 +71,37 @@ function showCitations() {
   toast('已展开引用来源');
 }
 
+function copyAnswer(btn) {
+  const text = btn.closest('.bubble')?.querySelector('[data-answer-text]')?.innerText || '';
+  if (navigator.clipboard && text) navigator.clipboard.writeText(text);
+  toast('回答内容已复制');
+}
+
+function retryAnswer(btn) {
+  const bubble = btn.closest('.bubble');
+  const answer = bubble?.querySelector('[data-answer-text]');
+  if (answer) answer.innerHTML = '重新生成后：乳化搅拌温度建议控制在 <b>60-65℃</b>，并在搅拌完成后静置脱泡 15 分钟。';
+  toast('已重新生成回答');
+}
+
+function deleteAnswer(btn) {
+  btn.closest('.bubble')?.remove();
+  toast('该条消息已删除');
+}
+
+function fillFollowUp(text) {
+  const input = document.getElementById('chatText');
+  if (input) {
+    input.value = text;
+    input.focus();
+  }
+}
+
+function deleteConversation(btn) {
+  btn.closest('.conversation-item')?.remove();
+  toast('会话已删除');
+}
+
 function sendMockMessage() {
   const input = document.getElementById('chatText');
   const list = document.getElementById('messageArea');
@@ -85,7 +116,7 @@ function sendMockMessage() {
   const ai = document.createElement('div');
   ai.className = 'bubble ai';
   const activeType = document.querySelector('[data-chat-type].active')?.textContent.trim() || '问公司文件';
-  ai.innerHTML = `根据本轮选择的 <b>${activeType}</b>，乳化搅拌温度建议控制在 <b>60-65℃</b>，搅拌完成后需静置脱泡 15 分钟。<div class="hint" style="margin-top:8px">本次消耗 1,280 token <button class="citation-btn" onclick="showCitations()">引用来源</button></div>`;
+  ai.innerHTML = `<div data-answer-text>根据本轮选择的 <b>${activeType}</b>，乳化搅拌温度建议控制在 <b>60-65℃</b>，搅拌完成后需静置脱泡 15 分钟。</div><div class="hint" style="margin-top:8px">本次消耗 1,280 token <button class="citation-btn" onclick="showCitations()">引用来源</button></div><div class="bubble-actions"><button onclick="copyAnswer(this)">复制</button><button onclick="retryAnswer(this)">重试</button><button onclick="deleteAnswer(this)">删除</button></div><div class="follow-up-list"><button onclick="fillFollowUp('如果温度超过65℃要怎么处理？')">追问：温度超限怎么办？</button><button onclick="fillFollowUp('这条标准适用于哪些产品批次？')">追问：适用批次？</button></div>`;
   setTimeout(() => {
     list.appendChild(ai);
     list.scrollTop = list.scrollHeight;

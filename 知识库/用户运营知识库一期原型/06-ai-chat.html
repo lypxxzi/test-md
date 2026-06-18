@@ -10,7 +10,7 @@
     <div class="chat-layout no-reference" id="chatLayout">
       <div class="conversation-list">
         <div class="card-title"><h3>会话</h3><button class="primary-btn" data-toast="已创建空白会话">＋ 新建</button></div>
-        <div class="conversation-item active">新会话</div>
+        <div class="conversation-item active" style="display:flex;justify-content:space-between;gap:8px"><span>新会话</span><button class="citation-btn" onclick="deleteConversation(this)">删除</button></div>
         <div class="empty" style="padding:22px"><div class="hint">初始状态只显示新会话；发送问题后形成消息记录。</div></div>
       </div>
       <div class="chat-main">
