@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AI应用启用</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" data-menu="enable" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">AI应用启用 ×</button></div><div class="user-actions">管理员：李艳萍 <span class="avatar"></span></div></div>
+    <div class="grid cols-3">
+      <div class="metric"><div class="label">当前状态</div><div class="value" style="color:#f59e0b">未启用</div><div class="hint">普通用户进入问答时提示联系管理员。</div></div>
+      <div class="metric"><div class="label">适用范围</div><div class="value">公司级</div><div class="hint">启用后公司内具备AI权限的用户可使用。</div></div>
+      <div class="metric"><div class="label">确认版本</div><div class="value">V1.0</div><div class="hint">免责声明和使用说明版本会被记录。</div></div>
+    </div>
+    <div class="card pad" style="margin-top:14px">
+      <h2>启用前确认</h2>
+      <div class="steps"><div class="step active">1. 管理员身份校验</div><div class="step active">2. 阅读功能说明</div><div class="step">3. 勾选免责声明</div><div class="step">4. 启用成功</div></div>
+      <div class="grid cols-2">
+        <div class="card pad"><h3>功能说明</h3><ul class="subtle-list"><li>用户可上传 PDF / DOCX 到用户知识库。</li><li>系统自动解析、切片、向量化，成功后可问答检索。</li><li>回答展示引用来源，引用只来自处理成功文件。</li></ul></div>
+        <div class="card pad"><h3>风险提示</h3><ul class="subtle-list"><li>AI回答可能不准确，仅作辅助参考。</li><li>文件查看/下载权限不等于AI检索权限。</li><li>敏感文件不建议上传到知识库。</li></ul></div>
+      </div>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:13px"><input type="checkbox" checked>我已阅读并同意《AI 知识库使用免责声明》，确认仅上传适合公司内部 AI 检索的文件。</label>
+      <div style="margin-top:18px;display:flex;gap:10px"><button class="primary-btn" data-toast="AI知识库已启用">同意并启用</button><button class="ghost-btn">暂不启用</button></div>
+    </div>
+  </main>
+</div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'enable' })</script>
+</body></html>

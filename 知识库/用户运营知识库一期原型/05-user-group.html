@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>用户分组</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
+  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" data-menu="group" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <main class="page">
+    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">用户分组 ×</button></div><div class="user-actions">麦德臻好供应链(广州)有限公司 <span class="avatar"></span></div></div>
+    <div class="toolbar"><div class="toolbar-left"><button class="primary-btn" data-open="groupModal">＋ 新增用户分组</button></div><div class="toolbar-right"><input class="search" data-filter placeholder="分组名称/成员"></div></div>
+    <div class="grid cols-3">
+      <div class="metric"><div class="label">研发中心</div><div class="value">12人</div><div class="hint">可被授权研发资料。</div></div>
+      <div class="metric"><div class="label">质量部</div><div class="value">8人</div><div class="hint">可被授权内控和检验资料。</div></div>
+      <div class="metric"><div class="label">生产管理</div><div class="value">15人</div><div class="hint">可被授权工艺标准。</div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <table class="table"><thead><tr><th>分组编码</th><th>分组名称</th><th>成员</th><th>已授权文件</th><th>说明</th><th style="text-align:right">操作</th></tr></thead><tbody>
+        <tr data-filter-row><td>UG-001</td><td>研发中心</td><td>周晨、林悦、陈瑶 等12人</td><td>8</td><td>研发资料默认授权分组</td><td><div class="row-actions"><span data-open="groupModal">编辑成员</span><span data-toast="该分组已有文档授权，删除前请调整权限">删除</span></div></td></tr>
+        <tr data-filter-row><td>UG-002</td><td>质量部</td><td>王敏、李可、赵洁 等8人</td><td>12</td><td>质量和内控资料使用</td><td><div class="row-actions"><span data-open="groupModal">编辑成员</span><span data-toast="该分组已有文档授权，删除前请调整权限">删除</span></div></td></tr>
+      </tbody></table>
+    </div>
+  </main>
+</div>
+<div class="modal-mask" id="groupModal"><div class="modal large"><div class="modal-head"><b>用户分组</b><button class="icon-btn" data-close>×</button></div><div class="modal-body"><div class="form-grid"><div class="field-label">分组名称</div><input class="input" value="研发中心"><div class="field-label">分组说明</div><textarea class="textarea">研发资料默认授权分组</textarea><div class="field-label">选择成员</div><textarea class="textarea">周晨、林悦、陈瑶、黄俊、赵可、刘雨</textarea></div><p class="hint">用户被加入分组后，下次AI检索按最新分组权限计算可访问文档。</p></div><div class="modal-foot"><button class="ghost-btn" data-close>取消</button><button class="primary-btn" data-close data-toast="用户分组已保存">保存</button></div></div></div>
+<script src="assets/prototype.js"></script><script>initPrototype({ active: 'group' })</script>
+</body></html>

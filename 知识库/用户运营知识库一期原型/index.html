@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>用户知识库一期原型总览</title>
+  <link rel="stylesheet" href="assets/prototype.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="module-rail">
+      <button class="rail-item"><span class="icon">⌂</span><span>首页</span></button>
+      <button class="rail-item"><span class="icon">☷</span><span>审批</span></button>
+      <button class="rail-item"><span class="icon">▣</span><span>资产</span></button>
+      <button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button>
+      <button class="rail-item"><span class="icon">⚙</span><span>设置</span></button>
+    </aside>
+    <aside class="side-menu">
+      <div class="brand">知识库</div>
+      <a class="menu-link active" data-menu="index" href="index.html">原型总览</a>
+      <a class="menu-link" href="01-ai-enable.html">AI应用启用</a>
+      <a class="menu-link" href="02-equity-config.html">权益配置</a>
+      <a class="menu-link" href="03-knowledge-files.html">知识库文件</a>
+      <a class="menu-link" href="04-category.html">知识库分类</a>
+      <a class="menu-link" href="05-user-group.html">用户分组</a>
+      <a class="menu-link" href="06-ai-chat.html">用户知识库问答</a>
+      <a class="menu-link" href="07-token-summary.html">Token月汇总</a>
+    </aside>
+    <main class="page">
+      <div class="topbar">
+        <div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">用户知识库一期原型 ×</button></div>
+        <div class="user-actions">麦德臻好供应链(广州)有限公司 <span class="avatar"></span></div>
+      </div>
+      <div class="grid cols-3">
+        <div class="metric"><div class="label">一期范围</div><div class="value">用户知识库</div><div class="hint">运营知识库需求未整理，本次不展开。</div></div>
+        <div class="metric"><div class="label">核心页面</div><div class="value">7 个</div><div class="hint">启用、权益、文件、分类、分组、问答、Token。</div></div>
+        <div class="metric"><div class="label">UI 参考</div><div class="value">当前系统风格</div><div class="hint">左侧模块栏 + 二级菜单 + 顶部页签 + 表格。</div></div>
+      </div>
+      <div class="card pad" style="margin-top:14px">
+        <h2>页面入口</h2>
+        <div class="grid cols-2" style="margin-top:14px">
+          <a class="metric" href="01-ai-enable.html"><div class="label">01</div><div class="value">AI应用启用</div><div class="hint">管理员确认免责声明后启用。</div></a>
+          <a class="metric" href="02-equity-config.html"><div class="label">02</div><div class="value">权益配置</div><div class="hint">AI开关、容量、单文件、月token。</div></a>
+          <a class="metric" href="03-knowledge-files.html"><div class="label">03</div><div class="value">知识库文件</div><div class="hint">上传、处理状态、权限、重试、删除。</div></a>
+          <a class="metric" href="04-category.html"><div class="label">04</div><div class="value">知识库分类</div><div class="hint">分类维护，已使用分类不可删除。</div></a>
+          <a class="metric" href="05-user-group.html"><div class="label">05</div><div class="value">用户分组</div><div class="hint">文件授权时可选择用户分组。</div></a>
+          <a class="metric" href="06-ai-chat.html"><div class="label">06</div><div class="value">用户知识库问答</div><div class="hint">基于有权限文档检索，展示引用来源。</div></a>
+          <a class="metric" href="07-token-summary.html"><div class="label">07</div><div class="value">Token月汇总</div><div class="hint">公司全局月token额度判断。</div></a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/prototype.js"></script>
+  <script>initPrototype({ active: 'index' })</script>
+</body>
+</html>
