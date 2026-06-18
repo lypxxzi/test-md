@@ -96,6 +96,7 @@ button { cursor: pointer; }
 .show { display: block !important; }
 .toast { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); background: #202638; color: #fff; padding: 9px 14px; border-radius: 8px; display: none; z-index: 50; font-size: 13px; }
 .chat-layout { display: grid; grid-template-columns: 260px 1fr 330px; gap: 12px; height: calc(100vh - 110px); }
+.chat-layout.no-reference { grid-template-columns: 260px 1fr; }
 .conversation-list, .reference-panel, .chat-main { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .conversation-item { padding: 13px 14px; border-bottom: 1px solid #f2f4fa; font-size: 13px; }
 .conversation-item.active { background: var(--primary-soft); color: var(--primary); font-weight: 700; }
@@ -108,8 +109,15 @@ button { cursor: pointer; }
 .bubble { max-width: 76%; padding: 12px 14px; border-radius: 12px; margin-bottom: 14px; font-size: 14px; line-height: 1.65; }
 .bubble.user { margin-left: auto; background: var(--primary); color: #fff; border-bottom-right-radius: 3px; }
 .bubble.ai { background: #f2f5fb; color: #323a4d; border-bottom-left-radius: 3px; }
-.chat-input { padding: 12px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+.bubble-actions { display: flex; gap: 12px; margin-top: 10px; font-size: 12px; }
+.bubble-actions button { border: 0; background: transparent; color: var(--primary); padding: 0; cursor: pointer; }
+.follow-up-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.follow-up-list button { border: 1px solid #dfe4f2; background: #fff; color: #596174; border-radius: 999px; height: 26px; padding: 0 10px; font-size: 12px; }
+.chat-input { padding: 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+.chat-input-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.chat-input-main { display: flex; gap: 8px; }
 .chat-input textarea { flex: 1; min-height: 46px; max-height: 100px; resize: vertical; }
+.citation-btn { border: 0; background: transparent; color: var(--primary); padding: 0; margin-left: 8px; cursor: pointer; font-weight: 700; }
 .reference-card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 10px; background: #fbfcff; font-size: 12px; }
 .empty { padding: 44px; text-align: center; color: #a0a8ba; }
 .empty-title { color: #4b5563; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
