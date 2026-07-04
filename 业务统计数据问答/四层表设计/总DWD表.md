@@ -33,14 +33,28 @@
 | order_id | bigint | 订单id |
 | code | varchar | 订单号 |
 | client_id | bigint | 客户id |
-| client_name | varchar | 客户名 |
+| client_name | varchar | 客户名称 |
+| business_user_id | bigint | 业务员id |
+| business_user_name | varchar | 业务员名称 |
 | company_id | bigint | 公司id |
-| phase_status | int | 发货状态（0未发货，1部分发货，2全部发货，3强制完成） |
+| approval_status | int | 审批状态（0已审批，1失效，2作废） |
 | total_price | decimal | 合计金额 |
-| bus_type | varchar | 业务类型/数据生成节点 |
-| begin_date | bigint | 开始时间 |
+| bus_type | varchar | 数据生成节点/业务类型（本行由哪个业务事件产生） |
+| begin_date | bigint | 开始时间（本次事件发生时间） |
 | create_date | bigint | 创建时间（下单时间） |
 
-**更新逻辑（事件驱动）：** 订单在业务事件节点（如审批通过）触发时才写入DWD，`bus_type` 标记数据生成节点。订单新建但未审批时不进DWD，所以进入DWD的订单即为已审批的有效订单。
+（发货状态由另一张表专门维护，本表不含。）
 
-**用途：** 返单统计（场景4），按 order_id 去重后，用 客户id + 创建时间 判断首单/返单。
+**本质：** 记录订单全生命周期的事实表。订单每发生一个业务事件，就 append 一行，记录该时刻订单的快照 + 事件节点（bus_type）+ 事件时间（begin_date）。历史行不覆盖，取订单最新状态 = 该 order_id 下 begin_date 最大的行。订单在ODS新建但未审批时只在ODS、不进本表；进本表的订单即为已审批过的订单。
+
+**触发事件（开发现状，均由 ods_order 事件驱动）：**
+1. 订单审批完成（订单生效，首次进表）
+2. 订单强制完成
+3. 追加费用
+4. 删除追加费用
+
+每个事件 append 一行，bus_type 标记是哪个节点触发。
+
+**待确认：** 目前无"作废/失效"触发事件，订单审批后被作废/失效时本表不会新增行，最新行仍停在"已审批"。若返单等场景需要排除审批后作废的订单，需请开发补"作废/失效"事件。
+
+**用途（场景4返单）：** 进本表的订单即有效订单，取每个订单最新行、按 order_id 回到订单级；同一客户按下单时间排序，第1笔=首单，之后=返单。
