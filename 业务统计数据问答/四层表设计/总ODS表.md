@@ -44,3 +44,39 @@
 | total_price | decimal | 订单总额 |
 | create_date | bigint | 下单时间 |
 | delete_status | int | 删除状态（0未删除，1已删除） |
+
+---
+
+## ODS-3：订单产品明细表（7张，按产品类型分表，结构一致）
+
+**来源场景：** 场景12 — 客户出货统计
+
+| ODS 表 | 产品类型 |
+|------|------|
+| `ods_order_recipe_product` | 配方产品 |
+| `ods_order_half_product` | 中间品 |
+| `ods_order_product_specification` | 规格成品 |
+| `ods_order_different_product` | 非化妆品 |
+| `ods_order_plantraw` | 原料 |
+| `ods_order_pack` | 包材 |
+| `ods_order_assist` | 辅料 |
+
+**本场景用到的公共字段（7张均有）：**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| order_id | bigint | 订单id |
+| quantity | int/decimal | 数量（下单数量，明细件数） |
+| out_quantity | int/decimal | 已发货数量 |
+| offer_price | decimal | 单件报价 |
+| delivery_date | bigint | 出货日期 |
+| finish_date | bigint | 出货完成日期 |
+| phase_status | int | 进度状态（0未完成，1已完成/发货完成，2强制完成） |
+| create_date | bigint | 创建时间 |
+| company_id | bigint | 公司id |
+| delete_status | int | 删除状态（0未删除，1已删除） |
+
+**说明：**
+- 一条产品明细一行；一个主订单挂多条产品明细，每条明细独立发货（out_quantity 逐次累加）
+- client_id：中间品/规格成品/非化妆品 3 张有；配方产品/原料/包材/辅料 4 张没有，需 order_id 回连 `ods_order` 补客户
+- 明细级没有"部分发货"状态，部分发货靠 out_quantity < quantity 体现
