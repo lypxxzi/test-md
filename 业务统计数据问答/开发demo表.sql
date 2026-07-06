@@ -811,6 +811,51 @@ CREATE TABLE `ods_finish_product_specification`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '规格成品信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for ods_gathering_record
+-- ----------------------------
+DROP TABLE IF EXISTS `ods_gathering_record`;
+CREATE TABLE `ods_gathering_record`  (
+  `id` bigint NOT NULL,
+  `code` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '编号',
+  `gathering_date` bigint NULL DEFAULT 0 COMMENT '收款日期',
+  `client_id` bigint NULL DEFAULT NULL COMMENT '客户id',
+  `client_code` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '客户编号',
+  `client_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '客户名',
+  `secret` int NULL DEFAULT 0 COMMENT '是否保密（0否，1是）',
+  `company_account_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '公司账户名',
+  `company_account_type` int NULL DEFAULT 0 COMMENT '公司账户类型（0银行账户，1微信账户，2支付宝账户，3POS机账户，4现金账户，5其他账户）',
+  `client_account_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '客户账户名',
+  `client_account_type` int NULL DEFAULT 0 COMMENT '客户账户类型（0银行账户，1微信账户，2支付宝账户，3POS机账户，4现金账户，5其他账户）',
+  `gathering_price` decimal(40, 20) NULL DEFAULT NULL COMMENT '收款金额',
+  `allot_price` decimal(40, 20) NULL DEFAULT 0.00000000000000000000 COMMENT '分配金额（已分配到订单的金额）',
+  `allot_status` int NULL DEFAULT 0 COMMENT '分配状态（0未分配，1部分分配，2全部分配）',
+  `ticket_price` decimal(40, 20) NULL DEFAULT 0.00000000000000000000 COMMENT '有票据金额',
+  `ticket_status` int NULL DEFAULT 0 COMMENT '票据状态（0不完整，1完整）',
+  `approval_status` int NULL DEFAULT 0 COMMENT '审批状态（0未签名，1未审批，2已审批，3失效，4作废）',
+  `company_approval_task_template_id` bigint NULL DEFAULT 0 COMMENT '公司审批任务模板id',
+  `decide_date` bigint NULL DEFAULT 0 COMMENT '审定时间',
+  `fallcause` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '重做/作废原因',
+  `currency_id` bigint NULL DEFAULT NULL COMMENT '币别id',
+  `currency_type` int NULL DEFAULT NULL COMMENT '数据来源（0系统，1自定义）',
+  `currency_code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '币别编号',
+  `currency_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '币别名称',
+  `currency_symbol` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '货币符号',
+  `currency_exchange_rate_type` int NULL DEFAULT NULL COMMENT '汇率类型（0固定，1浮动）',
+  `currency_exchange_rate` decimal(23, 10) NULL DEFAULT NULL COMMENT '汇率值（小数）',
+  `currency_conversion_way` int NULL DEFAULT NULL COMMENT '折算方式（0原币*汇率=本位币，1原币/汇率=本位币）',
+  `edit_user_id` bigint NULL DEFAULT 0 COMMENT '编辑人id',
+  `edit_user_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '编辑人姓名',
+  `edit_date` bigint NULL DEFAULT 0 COMMENT '编辑时间',
+  `create_user_id` bigint NULL DEFAULT 0 COMMENT '创建人id',
+  `create_date` bigint NULL DEFAULT NULL COMMENT '创建时间',
+  `company_id` bigint NULL DEFAULT NULL COMMENT '所属公司id',
+  `delete_status` int NULL DEFAULT 0 COMMENT '删除状态（0未删除，1已删除）',
+  `delete_date` bigint NULL DEFAULT 0 COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `ix_ods_gr_companyid`(`company_id` ASC, `delete_status` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '收款记录表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for ods_order
 -- ----------------------------
 DROP TABLE IF EXISTS `ods_order`;
