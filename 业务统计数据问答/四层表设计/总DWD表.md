@@ -14,14 +14,16 @@
 | company_id | bigint | 公司id |
 | company_name | varchar | 公司名称 |
 | status | int | 客户状态（0未下单，1活跃，2非活跃） |
+| business_user_id | bigint | 业务员id（=ods_client.user_id，归属业务员） |
+| business_user_name | varchar | 业务员名称 |
 | begin_date | bigint | 开始时间（毫秒时间戳） |
 | end_date | bigint | 结束时间（毫秒时间戳，9999-12-31表示当前有效） |
 
-**更新逻辑：** 监测 ods_client 的 status 变化，当客户状态发生改变时：
+**更新逻辑：** 监测 ods_client 的 status **或** user_id（业务员归属）变化，任一发生改变时：
 1. 关闭旧行：将当前有效行的 end_date 设为变化时间
-2. 插入新行：begin_date = 变化时间，end_date = 9999-12-31 的时间戳
+2. 插入新行：begin_date = 变化时间，end_date = 9999-12-31 的时间戳，记录变化后的 status + business_user_id
 
-**查询方式：** 查某个时间点的客户状态：`WHERE begin_date <= 时间戳 AND end_date > 时间戳`
+**查询方式：** 查某个时间点的客户状态/归属业务员：`WHERE begin_date <= 时间戳 AND end_date > 时间戳`（业务员维度统计按该时点的 business_user_id 分组，归属变更前的月份自然归旧业务员）
 
 ---
 
