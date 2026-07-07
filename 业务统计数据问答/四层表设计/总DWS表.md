@@ -126,6 +126,8 @@ active_to_inactive_rate  = 活跃→非活跃转化率 = 本月活跃转非活�
 | client_id | bigint | 客户id |
 | client_name | varchar | 客户名称 |
 | company_id | bigint | 公司id |
+| business_user_id | bigint | 业务员id（从客户拉链表当前生效行取归属） |
+| business_user_name | varchar | 业务员名称 |
 | repeat_count_180d | int | 近180天返单次数（截至数据日期往前推的滑动值） |
 | repeat_count_365d | int | 近365天返单次数（截至数据日期往前推的滑动值） |
 | repeat_count_month | int | 当月返单次数（该自然月内新产生的返单笔数）——**待开发补** |
