@@ -37,7 +37,6 @@
 | business_user_id | bigint | 业务员id |
 | business_user_name | varchar | 业务员名称 |
 | company_id | bigint | 公司id |
-| approval_status | int | 审批状态（0已审批，1失效，2作废） |
 | total_price | decimal | 合计金额 |
 | bus_type | varchar | 数据生成节点/业务类型（本行由哪个业务事件产生） |
 | begin_date | bigint | 开始时间（本次事件发生时间） |
