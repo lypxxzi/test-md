@@ -80,3 +80,80 @@
 - 一条产品明细一行；一个主订单挂多条产品明细，每条明细独立发货（out_quantity 逐次累加）
 - client_id：中间品/规格成品/非化妆品 3 张有；配方产品/原料/包材/辅料 4 张没有，需 order_id 回连 `ods_order` 补客户
 - 明细级没有"部分发货"状态，部分发货靠 out_quantity < quantity 体现
+
+**其他场景补充字段（业务库已有，同步时一并带上）：**
+
+| 字段 | 类型 | 说明 | 覆盖范围 |
+|------|------|------|------|
+| product_id | bigint | 产品id | 7张均有（TOP30产品统计用） |
+| product_code | varchar | 产品编号 | 7张均有 |
+| product_name | varchar | 产品名 | 7张均有 |
+| production_status | int | 生产状态（0未处理,1不需生产,2部分生产,3全部生产） | 仅4张需生产明细（配方/中间品/规格成品/非化妆品），在产/未排产判断用 |
+| budget_cost_single | decimal | 预算单件成本 | 仅4张需生产明细（成本暂不关注，字段先同步） |
+
+---
+
+## ODS-4：`ods_delivery`（发货单信息表 · 主表）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 发货单id |
+| company_id | bigint | 公司id |
+| type | int | 产品类型（0配方产品,1中间品,2成品,3非化妆品,4原料,5包材,6辅料） |
+| product_line_id | bigint | 产线id |
+| product_line_name | varchar | 产线名 |
+| code | varchar | 发货单号 |
+| back_code | varchar | 回返单号 |
+| delivery_date | bigint | 发货时间 |
+| out_date | bigint | 实际出库日期 |
+| client_id | bigint | 客户id |
+| client_code | varchar | 客户编号 |
+| client_name | varchar | 客户名 |
+| secret | int | 是否保密（0否，1是） |
+| linkman_id | bigint | 联系人id |
+| linkman_name | varchar | 联系人姓名 |
+| linkman_phone | varchar | 联系人手机号码 |
+| province | varchar | 省 |
+| city | varchar | 市 |
+| area | varchar | 区 |
+| address | varchar | 详细地址 |
+| address_type | int | 地址类型（0国内地址，1国外地址） |
+| status | int | 发货状态（0未签名，1未审，2已审，3已出库，4失效，5作废） |
+| approval_status | int | 审核状态（0未签名，1未审核，2已审核，3失效，4作废） |
+| approval_date | bigint | 审定时间 |
+| reason | varchar | 重做/作废原因 |
+| approval_template_id | bigint | 公司审批任务模板id |
+| user_id | bigint | 业务员id/用户id |
+| user_name | varchar | 业务员姓名 |
+| delivery_type | int | 发货类型（0正常发货，1预备发货，2预备发货已完成） |
+| code_collection | varchar | 订单号、产品编号、产品名集合 |
+| sign_pdf | varchar | 签收文件pdf |
+| pdf_url | varchar | pdf文档路径 |
+| pdf_create_date | bigint | pdf创建时间 |
+| sign_status | int | 签收照状态（0无，1有） |
+| docx_url | varchar | docx文档路径 |
+| docx_create_date | bigint | docx创建时间 |
+
+**说明：**
+- 一张发货单一行；一张发货单挂多条发货明细（ODS-5），同一订单产品明细可分多张发货单多次发货
+- 有效出货口径：status=3（已出库）；status=4失效/5作废 不计入出货统计
+- 客户/地址/业务员信息发货单上冗余存了一份，出货统计可直接用，不必回连 `ods_order`
+
+---
+
+## ODS-5：`ods_delivery_detail`（发货明细表）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 发货明细id |
+| delivery_id | bigint | 发货单id |
+| order_detail_id | bigint | 订单明细id（对应7张订单产品明细表的id，含包材等各产品类型） |
+| out_quantity | decimal | 出货数量（本次发货数量，单次值、非累计） |
+| remark | varchar | 出库备注 |
+| check_status | int | 对账状态（0不需对账，1未对账，2已对账） |
+| company_id | bigint | 公司id |
+
+**说明：**
+- 一条发货明细一行 = 某张发货单里某条订单产品明细的本次出货数量
+- order_detail_id 指向哪张订单产品明细表，由主表 `ods_delivery.type`（产品类型）决定
+- 某条订单产品明细的累计已发货数量 = ∑该 order_detail_id 下、主表已出库（status=3）发货单的 out_quantity（应与 ODS-3 的 out_quantity 对得上，可做校验）
