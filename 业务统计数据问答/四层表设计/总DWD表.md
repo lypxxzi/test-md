@@ -122,15 +122,34 @@
 | delete_status | int | 删除状态（0未删除，1已删除） |
 | delete_date | bigint | 删除时间 |
 
+补充字段（发货单驱动后新增）：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| delivery_id | bigint | 发货单id（本行由哪张发货单触发） |
+| delivery_code | varchar(60) | 发货单号 |
+| this_out_quantity | decimal(40,20) | 本次出货数量（该发货明细单次值；out_quantity 为累计值） |
+
 **本质：** 只记"发货"事件的明细级拉链表（方案A）：只要某条订单产品明细发生一次发货事件就 append 一行，**没发过货的明细不进本表**。历史行不覆盖，取某明细最新出货状态 = 该 order_product_id 下 begin_date 最大的行。下单数量/金额不在本表，由 DWD-3 提供。
 
-**触发事件（bus_type 标节点，均由发货业务驱动）：**
-1. 发货审核完成（每次发货）— out_quantity 累加、delivery_date 更新；未发满时 phase_status 仍=0未完成（明细级用数量差体现部分发货，无"部分发货"状态）
-2. 发货完成 — out_quantity 发满，phase_status→1
-3. 强制完成 — phase_status→2
+**事件源改为发货单（ODS-4/ODS-5），生成逻辑：**
 
-**待确认：** 发货撤销/退货是否也 append 一行回退 out_quantity（ODS 未见退货字段，需与开发确认）。
+监听 `ods_delivery`（发货单主表）的 status（发货状态）变化，按发货单驱动写入；每张发货单出库时，对它下面的每条 `ods_delivery_detail`（发货明细）各 append 一行：
 
-**数据来源：** 7 张订单产品明细 ODS（配方/中间品/规格成品/非化妆品/原料/包材/辅料）UNION；缺 client_id 的 4 张（配方/原料/包材/辅料）用 order_id 回连 `ods_order` 补 client_id/client_name。
+1. **发货单出库（status→3已出库）**，对该发货单每条发货明细：
+   - 用 delivery_detail.order_detail_id + delivery.type（产品类型）定位到对应订单产品明细（7张ODS之一）
+   - this_out_quantity = 该发货明细的出货数量；out_quantity = 该 order_detail_id 历史累计（∑此前已出库发货单的出货数量 + 本次）
+   - delivery_date = 发货单的发货时间（归月用）；begin_date = 出库事件时间
+   - out_quantity < quantity（DWD-3）→ phase_status 仍=0未完成（部分发货靠数量差体现）；发满 → phase_status=1，finish_date = 本次出库时间
+2. **发货单失效/作废（status→4/5，且此前已出库计入过）**：对该单每条发货明细 append 一行回退，out_quantity 扣减该单的出货数量，this_out_quantity 记负数，bus_type 标"发货作废/失效"（解决原"发货撤销如何回退"的待确认问题）
+3. **订单明细强制完成**（订单侧事件，非发货单驱动）— phase_status→2
+
+**口径：**
+- 只统计 status=3 已出库的发货单；未签名/未审/已审未出库不产生行
+- client_id/client_name/省市区/业务员 直接取发货单冗余字段，不必回连 `ods_order`；发货单缺失时再用 order_id 回连补
+- delivery_type：0正常发货计入；1预备发货/2预备发货已完成 是否计入出货统计【待与业务确认】
+- 同一订单产品明细可被多张发货单多次发货，每次出库各 append 一行，出货数量按月归集时用 this_out_quantity 求和（∑单次值），避免用累计值重复计算
+
+**数据来源：** `ods_delivery` + `ods_delivery_detail`（事件源、出货数量）；7 张订单产品明细 ODS（产品信息、quantity、offer_price）；`ods_order`（兜底补客户）。
 
 **说明：** 开发库目前没有这张，需新建。
