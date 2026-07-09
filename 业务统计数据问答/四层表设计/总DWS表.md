@@ -322,8 +322,8 @@ active_to_inactive_rate  = 活跃→非活跃转化率 = 本月活跃转非活�
 | id | bigint | 主键（自增） |
 | client_id | bigint | 客户id |
 | client_name | varchar(100) | 客户名 |
-| order_quantity | decimal(40,20) | 当月下单数量 |
-| order_amount | decimal(40,20) | 当月下单金额 |
+| order_quantity | decimal(40,20) | 当月下单数量（主单笔数，即下单次数） |
+| order_amount | decimal(40,20) | 当月下单金额（∑主单合计金额，含税） |
 | ship_quantity | decimal(40,20) | 当月出货数量 |
 | ship_amount | decimal(40,20) | 当月出货金额 |
 | data_date | bigint | 数据日期 |
@@ -334,16 +334,16 @@ active_to_inactive_rate  = 活跃→非活跃转化率 = 本月活跃转非活�
 | delete_date | bigint | 删除时间 |
 
 **数据来源：**
-- 下单侧 DWD-3 `dwd_order_detail_bus_snapshot`（拉链取昨天结束时正在生效的行）
-- 出货侧 DWD-4 `dwd_order_ship_detail_snapshot`（每条明细取最新行 = 该 order_product_id 下 begin_date 最大）
+- 下单侧 DWD-2 `dwd_order_bus_snapshot`（订单业务拉链表，主单级，每单取最新有效行）
+- 出货侧 DWD-4 订单出货明细业务快照表（取出货日期落在当月的事件行）
 
 **执行时间：** 每天凌晨，覆盖更新“昨天所属月份”行（统计该月1号~昨天24点）；月初1号跑完上月即定格
 
 **执行逻辑（两侧各按各的日期归月，再按 客户+公司+月 拼一行）：**
-1、下单侧：取 create_date 落在当月的明细 → order_quantity=∑quantity、order_amount=∑(quantity×offer_price)（当月增量值）
-2、出货侧：取 delivery_date 落在当月的明细 → ship_quantity=∑out_quantity、ship_amount=∑(out_quantity×offer_price)（当月增量值；⚠️out_quantity是累计已发货数，明细跨月分批发货时需用差值：本月最新行out_quantity − 上月末最新行out_quantity，避免把上月发的量算进本月）
+1、下单侧：取下单时间落在当月的有效主单（每单取最新行）→ order_quantity=主单笔数、order_amount=∑主单合计金额（当月增量值）
+2、出货侧：取出货日期落在当月的事件行 → ship_quantity=∑本次出货数量、ship_amount=∑本次出货金额（当月增量值；用单次值直接求和，回退行是负数天然冲扣，不存在累计值重复算问题）
 3、以 client_id+company_id+月 为键合并两侧成一行，写入/覆盖当月行（某月只下单没发货→出货为0；只发货没下单→下单为0）
 
-**口径提醒：** 同条明细"下单月"和"出货月"可能不同（这月下、下月发），一行里 order_* 与 ship_* 是"该月下了多少 / 该月发了多少"两个独立口径，不是同一批货的一一对应。
+**口径提醒：** 下单侧是主单级（笔数/合计金额）、出货侧是发货明细级（数量×报价）；"下单月"和"出货月"可能不同（这月下、下月发），一行里 order_* 与 ship_* 是"该月下了多少 / 该月发了多少"两个独立口径，不是同一批货的一一对应。
 
 **说明：** 开发库目前没有这张，需新建。
