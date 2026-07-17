@@ -181,9 +181,38 @@
 
 **执行逻辑：** 年度同比与环比相同（均对比上一年），只保留同比一组字段；历史最高=全历史年产能max
 
-## 三、DWS层依赖
+## 三、DWS层依赖（共2张，按类型行存）
 
-| 表 | 粒度 | 说明 |
+### DWS-1：`dws_line_packaging_capacity_daily`（产线包装产能汇总_天）
+
+**粒度：一个公司 + 一条产线 + 一个产能类型 + 一天**（每天每产线3行）
+
+| 字段 | 类型 | 说明 |
 |------|------|------|
-| `dws_line_packaging_capacity_daily`（产线包装产能汇总_天） | 公司+产线+天 | 由DWD包装生产明细按天聚合，供ADS-1/ADS-3 |
-| `dws_line_packaging_capacity_monthly`（产线包装产能汇总_月） | 公司+产线+月 | 由天表上卷，供ADS-2/ADS-4/ADS-5/ADS-6 |
+| id | bigint | 主键 |
+| company_id | bigint | 公司id |
+| line_id | bigint | 产线id |
+| line_name | varchar | 产线名称 |
+| qty_type | tinyint | 产能类型（1=总产能，2=单品，3=组品） |
+| qty | int | 当日生产数量（件） |
+| data_date | varchar | 数据日期（yyyy-MM-dd） |
+
+**执行时间：** 每天，由DWD包装生产明细按天聚合｜供ADS-1/ADS-3
+
+### DWS-2：`dws_line_packaging_capacity_monthly`（产线包装产能汇总_月）
+
+**粒度：一个公司 + 一条产线 + 一个产能类型 + 一个月**（每月每产线3行）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| company_id | bigint | 公司id |
+| line_id | bigint | 产线id |
+| line_name | varchar | 产线名称 |
+| qty_type | tinyint | 产能类型（1=总产能，2=单品，3=组品） |
+| qty | int | 当月生产数量（件） |
+| data_date_str | varchar | 数据月份（yyyy-MM） |
+
+**执行时间：** 每月1号，由天表上卷｜供ADS-2/ADS-4/ADS-5/ADS-6
+
+> 说明：总产能、单品、组品三个类型独立取数，单品+组品不要求等于总产能；ADS跑批时按 qty_type 行转列后计算累计、同比环比等派生指标。
