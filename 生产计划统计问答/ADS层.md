@@ -117,9 +117,28 @@
 
 **粒度：一个公司 + 一条产线 + 一个季度**
 
-字段同 ADS-4，差异：统计期为 `data_date_str`（yyyy-Qn）；hist_max_qty=历史最高季产能；同比=对比去年同季，环比=对比上一季度
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| company_id | bigint | 公司id |
+| line_id | bigint | 产线id |
+| line_name | varchar | 产线名称 |
+| total_qty | int | 本季度总产能（件） |
+| single_qty | int | 本季度单品产能（件） |
+| combo_qty | int | 本季度组品产能（件） |
+| total_yoy_rate | decimal | 总产能同比增减幅度（%，对比去年同季度） |
+| total_mom_rate | decimal | 总产能环比增减幅度（%，对比上一季度） |
+| single_yoy_rate | decimal | 单品产能同比增减幅度（%） |
+| single_mom_rate | decimal | 单品产能环比增减幅度（%） |
+| combo_yoy_rate | decimal | 组品产能同比增减幅度（%） |
+| combo_mom_rate | decimal | 组品产能环比增减幅度（%） |
+| hist_max_qty | int | 历史最高季度产能（件） |
+| hist_max_rate | decimal | 历史最高达成率（%）＝本季度总产能/历史最高季度产能 |
+| data_date_str | varchar | 统计季度（yyyy-Qn，如2025-Q3） |
 
 **执行时间：** 每季度首日
+
+**执行逻辑：** 同比=对比去年同季度，环比=对比上一季度；历史最高=全历史季度产能max
 
 ### ADS-6：`ads_line_packaging_ratio_yearly`（产线包装产能同环比_年）
 
@@ -127,9 +146,25 @@
 
 **粒度：一个公司 + 一条产线 + 一年**
 
-字段同 ADS-4，差异：统计期为 `data_date_str`（yyyy）；hist_max_qty=历史最高年产能；同比与环比相同（均对比上一年）
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| company_id | bigint | 公司id |
+| line_id | bigint | 产线id |
+| line_name | varchar | 产线名称 |
+| total_qty | int | 本年总产能（件） |
+| single_qty | int | 本年单品产能（件） |
+| combo_qty | int | 本年组品产能（件） |
+| total_yoy_rate | decimal | 总产能同比增减幅度（%，对比上一年） |
+| single_yoy_rate | decimal | 单品产能同比增减幅度（%） |
+| combo_yoy_rate | decimal | 组品产能同比增减幅度（%） |
+| hist_max_qty | int | 历史最高年产能（件） |
+| hist_max_rate | decimal | 历史最高达成率（%）＝本年总产能/历史最高年产能 |
+| data_date_str | varchar | 统计年（yyyy） |
 
 **执行时间：** 每年1月1号
+
+**执行逻辑：** 年度同比与环比相同（均对比上一年），只保留同比一组字段；历史最高=全历史年产能max
 
 ## 三、DWS层依赖
 
