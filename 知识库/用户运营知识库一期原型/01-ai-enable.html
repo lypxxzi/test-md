@@ -1,34 +1,105 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AI应用启用</title><link rel="stylesheet" href="assets/prototype.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI &#x77E5;&#x8BC6;&#x5E93;&#x786E;&#x8BA4;</title>
+  <link rel="stylesheet" href="assets/prototype.css">
+</head>
 <body>
 <div class="app-shell">
-  <aside class="module-rail"><button class="rail-item"><span class="icon">⌂</span><span>首页</span></button><button class="rail-item"><span class="icon">☷</span><span>审批</span></button><button class="rail-item"><span class="icon">▣</span><span>资产</span></button><button class="rail-item active"><span class="icon">▣</span><span>知识库</span></button><button class="rail-item"><span class="icon">⚙</span><span>设置</span></button></aside>
-  <aside class="side-menu"><div class="brand">知识库</div><a class="menu-link" href="index.html">原型总览</a><a class="menu-link" data-menu="enable" href="01-ai-enable.html">AI应用启用</a><a class="menu-link" href="02-equity-config.html">权益配置</a><a class="menu-link" href="03-knowledge-files.html">知识库文件</a><a class="menu-link" href="04-category.html">知识库分类</a><a class="menu-link" href="05-user-group.html">用户分组</a><a class="menu-link" href="06-ai-chat.html">用户知识库问答</a><a class="menu-link" href="07-token-summary.html">Token月汇总</a></aside>
+  <aside class="module-rail">
+    <button class="rail-item"><span class="icon">&#x2302;</span><span>&#x9996;&#x9875;</span></button>
+    <button class="rail-item"><span class="icon">&#x2637;</span><span>&#x5BA1;&#x6279;</span></button>
+    <button class="rail-item"><span class="icon">&#x25A3;</span><span>&#x8D44;&#x6599;</span></button>
+    <button class="rail-item active"><span class="icon">&#x25A3;</span><span>&#x77E5;&#x8BC6;&#x5E93;</span></button>
+    <button class="rail-item"><span class="icon">&#x2699;</span><span>&#x8BBE;&#x7F6E;</span></button>
+  </aside>
+  <aside class="side-menu">
+    <div class="brand">&#x77E5;&#x8BC6;&#x5E93;</div>
+    <a class="menu-link" href="index.html">&#x539F;&#x578B;&#x603B;&#x89C8;</a>
+    <a class="menu-link" data-menu="enable" href="01-ai-enable.html">AI &#x77E5;&#x8BC6;&#x5E93;&#x786E;&#x8BA4;</a>
+    <a class="menu-link" href="02-equity-config.html">&#x6743;&#x76CA;&#x914D;&#x7F6E;</a>
+    <a class="menu-link" href="03-knowledge-files.html">&#x77E5;&#x8BC6;&#x5E93;&#x6587;&#x4EF6;</a>
+    <a class="menu-link" href="04-category.html">&#x77E5;&#x8BC6;&#x5E93;&#x5206;&#x7C7B;</a>
+    <a class="menu-link" href="05-user-group.html">&#x7528;&#x6237;&#x5206;&#x7EC4;</a>
+    <a class="menu-link" href="06-ai-chat.html">&#x77E5;&#x8BC6;&#x5E93;&#x95EE;&#x7B54;</a>
+    <a class="menu-link" href="07-token-summary.html">Token &#x6708;&#x6C47;&#x603B;</a>
+  </aside>
   <main class="page">
-    <div class="topbar"><div class="tabs"><button class="home-tab">⌂</button><button class="page-tab active">AI应用启用 ×</button></div><div class="user-actions">管理员：李艳萍 <span class="avatar"></span></div></div>
+    <div class="topbar">
+      <div class="tabs"><button class="home-tab">&#x2302;</button><button class="page-tab active">AI &#x77E5;&#x8BC6;&#x5E93;&#x786E;&#x8BA4; &times;</button></div>
+      <div class="user-actions">&#x7BA1;&#x7406;&#x5458; &#x674E;&#x840D;<span class="avatar"></span></div>
+    </div>
+
     <div class="grid cols-3">
-      <div class="metric"><div class="label">当前状态</div><div class="value" style="color:#f59e0b">未启用</div><div class="hint">普通用户进入问答时提示联系管理员。</div></div>
-      <div class="metric"><div class="label">适用范围</div><div class="value">公司级</div><div class="hint">启用后公司内具备AI权限的用户可使用。</div></div>
-      <div class="metric"><div class="label">确认版本</div><div class="value">V1.0</div><div class="hint">免责声明和使用说明版本会被记录。</div></div>
+      <div class="metric"><div class="label">&#x5F53;&#x524D;&#x72B6;&#x6001;</div><div class="value" style="color:#f59e0b">&#x672A;&#x542F;&#x7528;</div><div class="hint">&#x7528;&#x6237;&#x8FDB;&#x5165; AI &#x65F6;&#x63D0;&#x793A;&#x8054;&#x7CFB;&#x7BA1;&#x7406;&#x5458;</div></div>
+      <div class="metric"><div class="label">&#x786E;&#x8BA4;&#x8303;&#x56F4;</div><div class="value">&#x516C;&#x53F8;&#x7EA7;</div><div class="hint">&#x9002;&#x7528;&#x4E8E;&#x672C;&#x516C;&#x53F8;&#x77E5;&#x8BC6;&#x5E93;&#x6587;&#x4EF6;</div></div>
+      <div class="metric"><div class="label">&#x786E;&#x8BA4;&#x4E66;&#x7248;&#x672C;</div><div class="value">V1.0</div><div class="hint">&#x7B7E;&#x7F72;&#x540E;&#x8BB0;&#x5F55;&#x7BA1;&#x7406;&#x5458;&#x4E0E;&#x65F6;&#x95F4;</div></div>
     </div>
+
     <div class="card pad" style="margin-top:14px" id="enableBefore">
-      <h2>启用前确认</h2>
-      <div class="steps"><div class="step active">1. 管理员身份校验</div><div class="step active">2. 阅读功能说明</div><div class="step">3. 勾选免责声明</div><div class="step">4. 启用成功</div></div>
-      <div class="grid cols-2">
-        <div class="card pad"><h3>功能说明</h3><ul class="subtle-list"><li>用户可上传 PDF / DOCX 到用户知识库。</li><li>系统自动解析、切片、向量化，成功后可问答检索。</li><li>回答展示引用来源，引用只来自处理成功文件。</li></ul></div>
-        <div class="card pad"><h3>风险提示</h3><ul class="subtle-list"><li>AI回答可能不准确，仅作辅助参考。</li><li>文件查看/下载权限不等于AI检索权限。</li><li>敏感文件不建议上传到知识库。</li></ul></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+        <div>
+          <h2 style="margin:0 0 6px">&#x516C;&#x53F8;&#x77E5;&#x8BC6;&#x5E93; AI &#x68C0;&#x7D22;&#x786E;&#x8BA4;&#x4E66;</h2>
+          <div class="hint">&#x8BF7;&#x7531;&#x516C;&#x53F8;&#x7BA1;&#x7406;&#x5458;&#x9605;&#x8BFB;&#x5E76;&#x786E;&#x8BA4;&#x3002;&#x786E;&#x8BA4;&#x540E;&#xFF0C;AI &#x77E5;&#x8BC6;&#x5E93;&#x529F;&#x80FD;&#x5C06;&#x5728;&#x5F53;&#x524D;&#x516C;&#x53F8;&#x8303;&#x56F4;&#x5185;&#x542F;&#x7528;&#x3002;</div>
+        </div>
+        <span class="badge warn">&#x5F85;&#x7BA1;&#x7406;&#x5458;&#x786E;&#x8BA4;</span>
       </div>
-      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:13px"><input type="checkbox" checked>我已阅读并同意《AI 知识库使用免责声明》，确认仅上传适合公司内部 AI 检索的文件。</label>
-      <div style="margin-top:18px;display:flex;gap:10px"><button class="primary-btn" data-show-target="enableAfter" data-hide-target="enableBefore" data-toast="AI知识库已启用">同意并启用</button><button class="ghost-btn">暂不启用</button></div>
+
+      <div class="grid cols-3" style="margin-top:16px">
+        <div class="card pad"><div class="hint">&#x7B7E;&#x7F72;&#x516C;&#x53F8;</div><b>&#x767E;&#x4E8B;&#x901A;&#x65E5;&#x5316;&#x6709;&#x9650;&#x516C;&#x53F8;</b></div>
+        <div class="card pad"><div class="hint">&#x7B7E;&#x7F72;&#x4EBA;</div><b>&#x674E;&#x840D; / &#x516C;&#x53F8;&#x7BA1;&#x7406;&#x5458;</b></div>
+        <div class="card pad"><div class="hint">&#x751F;&#x6548;&#x8303;&#x56F4;</div><b>&#x5F53;&#x524D;&#x516C;&#x53F8; AI &#x77E5;&#x8BC6;&#x5E93;</b></div>
+      </div>
+
+      <div class="card pad" style="margin-top:16px;background:#fbfcff">
+        <h3 style="margin-top:0">&#x786E;&#x8BA4;&#x5185;&#x5BB9;</h3>
+        <ul class="subtle-list">
+          <li>&#x52A0;&#x5165;&#x77E5;&#x8BC6;&#x5E93; = &#x516C;&#x53F8;&#x7EA7; AI &#x53EF;&#x68C0;&#x7D22;&#x8D44;&#x6599;&#x3002;</li>
+          <li>&#x4E0A;&#x4F20; / &#x52A0;&#x5165;&#x540E;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x4F1A;&#x7528;&#x4E8E; AI &#x95EE;&#x7B54;&#x3001;&#x77E5;&#x8BC6;&#x68C0;&#x7D22;&#x3001;&#x5185;&#x5BB9;&#x5F15;&#x7528;&#x3002;</li>
+          <li>&#x7CFB;&#x7EDF;&#x4F1A;&#x89E3;&#x6790;&#x3001;&#x5207;&#x7247;&#x3001;&#x5411;&#x91CF;&#x5316;&#x6587;&#x4EF6;&#x5185;&#x5BB9;&#xFF0C;&#x7528;&#x4E8E;&#x516C;&#x53F8;&#x8303;&#x56F4;&#x5185;&#x7684; AI &#x68C0;&#x7D22;&#x80FD;&#x529B;&#x3002;</li>
+          <li>&#x516C;&#x53F8;&#x5185;&#x5DF2;&#x5F00;&#x901A; AI &#x4F7F;&#x7528;&#x6743;&#x9650;&#x7684;&#x7528;&#x6237;&#xFF0C;&#x5747;&#x53EF;&#x80FD;&#x68C0;&#x7D22;&#x5230;&#x76F8;&#x5173;&#x6587;&#x4EF6;&#x5185;&#x5BB9;&#x3002;</li>
+          <li>&#x8BF7;&#x52FF;&#x4E0A;&#x4F20;&#x6216;&#x52A0;&#x5165;&#x672A;&#x7ECF;&#x516C;&#x53F8;&#x6388;&#x6743;&#x3001;&#x4EC5;&#x9650;&#x4E2A;&#x4EBA;&#x4F7F;&#x7528;&#x3001;&#x6D89;&#x5BC6;&#x3001;&#x654F;&#x611F;&#x3001;&#x53D7;&#x9650;&#x4F20;&#x64AD;&#x6216;&#x4E0D;&#x9002;&#x5408;&#x5728;&#x516C;&#x53F8;&#x8303;&#x56F4;&#x5185;&#x5171;&#x4EAB;&#x7684;&#x6587;&#x4EF6;&#x3002;</li>
+          <li>&#x7BA1;&#x7406;&#x5458;&#x5E94;&#x6839;&#x636E;&#x516C;&#x53F8;&#x5185;&#x90E8;&#x7BA1;&#x7406;&#x8981;&#x6C42;&#xFF0C;&#x786E;&#x8BA4;&#x6587;&#x4EF6;&#x6765;&#x6E90;&#x3001;&#x4F7F;&#x7528;&#x8303;&#x56F4;&#x548C;&#x53EF;&#x5171;&#x4EAB;&#x6027;&#x3002;</li>
+        </ul>
+      </div>
+
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:13px;line-height:1.7">
+        <input id="confirmCheckbox" type="checkbox" style="margin-top:4px">
+        <span>&#x6211;&#x5DF2;&#x77E5;&#x6653;&#x5E76;&#x786E;&#x8BA4;&#xFF1A;&#x52A0;&#x5165;&#x77E5;&#x8BC6;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5C06;&#x4F5C;&#x4E3A;&#x516C;&#x53F8;&#x7EA7;&#x77E5;&#x8BC6;&#x8D44;&#x6599;&#x7528;&#x4E8E; AI &#x68C0;&#x7D22;&#x548C;&#x95EE;&#x7B54;&#xFF0C;&#x516C;&#x53F8;&#x5185;&#x5DF2;&#x5F00;&#x901A; AI &#x4F7F;&#x7528;&#x6743;&#x9650;&#x7684;&#x7528;&#x6237;&#x5747;&#x53EF;&#x80FD;&#x68C0;&#x7D22;&#x5230;&#x76F8;&#x5173;&#x5185;&#x5BB9;&#xFF1B;&#x6211;&#x5C06;&#x786E;&#x4FDD;&#x76F8;&#x5173;&#x6587;&#x4EF6;&#x5DF2;&#x83B7;&#x5F97;&#x516C;&#x53F8;&#x6388;&#x6743;&#x4E14;&#x9002;&#x5408;&#x5728;&#x516C;&#x53F8;&#x8303;&#x56F4;&#x5185;&#x5171;&#x4EAB;&#x3002;</span>
+      </label>
+
+      <div style="margin-top:18px;display:flex;gap:10px">
+        <button id="enableButton" class="primary-btn" data-show-target="enableAfter" data-hide-target="enableBefore" data-toast="AI &#x77E5;&#x8BC6;&#x5E93;&#x5DF2;&#x542F;&#x7528;" disabled>&#x7B7E;&#x7F72;&#x5E76;&#x542F;&#x7528; AI &#x77E5;&#x8BC6;&#x5E93;</button>
+        <button class="ghost-btn">&#x6682;&#x4E0D;&#x542F;&#x7528;</button>
+      </div>
     </div>
+
     <div class="card pad is-hidden" id="enableAfter" style="margin-top:14px">
-      <div class="status-line"><span class="status-dot ok"></span><b>AI知识库已启用</b></div>
-      <div class="steps"><div class="step active">1. 管理员确认</div><div class="step active">2. 公司权益生效</div><div class="step active">3. 用户可进入问答</div></div>
-      <ul class="subtle-list"><li>启用人：李艳萍</li><li>启用范围：当前公司</li><li>下一步：到“知识库文件”上传第一份文件，处理成功后即可问答。</li></ul>
-      <div style="margin-top:16px"><a class="primary-btn" href="03-knowledge-files.html">去上传文件</a></div>
+      <div class="status-line"><span class="status-dot ok"></span><b>AI &#x77E5;&#x8BC6;&#x5E93;&#x5DF2;&#x542F;&#x7528;</b></div>
+      <div class="grid cols-3" style="margin-top:16px">
+        <div class="card pad"><div class="hint">&#x7B7E;&#x7F72;&#x4EBA;</div><b>&#x674E;&#x840D; / &#x516C;&#x53F8;&#x7BA1;&#x7406;&#x5458;</b></div>
+        <div class="card pad"><div class="hint">&#x7B7E;&#x7F72;&#x65F6;&#x95F4;</div><b>2026-06-18 14:30</b></div>
+        <div class="card pad"><div class="hint">&#x786E;&#x8BA4;&#x4E66;&#x7248;&#x672C;</div><b>V1.0</b></div>
+      </div>
+      <ul class="subtle-list" style="margin-top:16px">
+        <li>&#x5F53;&#x524D;&#x516C;&#x53F8;&#x5DF2;&#x542F;&#x7528; AI &#x77E5;&#x8BC6;&#x5E93;&#x80FD;&#x529B;&#x3002;</li>
+        <li>&#x540E;&#x7EED;&#x52A0;&#x5165;&#x77E5;&#x8BC6;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5C06;&#x4F5C;&#x4E3A;&#x516C;&#x53F8;&#x7EA7;&#x77E5;&#x8BC6;&#x8D44;&#x6599;&#x53C2;&#x4E0E; AI &#x68C0;&#x7D22;&#x548C;&#x95EE;&#x7B54;&#x3002;</li>
+        <li>&#x7B7E;&#x7F72;&#x8BB0;&#x5F55;&#x5DF2;&#x4FDD;&#x5B58;&#xFF0C;&#x53EF;&#x5728; AI &#x5E94;&#x7528;&#x8BBE;&#x7F6E;&#x4E2D;&#x67E5;&#x770B;&#x3002;</li>
+      </ul>
+      <div style="margin-top:16px"><a class="primary-btn" href="03-knowledge-files.html">&#x53BB;&#x4E0A;&#x4F20;&#x77E5;&#x8BC6;&#x5E93;&#x6587;&#x4EF6;</a></div>
     </div>
   </main>
 </div>
-<script src="assets/prototype.js"></script><script>initPrototype({ active: 'enable' })</script>
-</body></html>
+<script src="assets/prototype.js"></script>
+<script>
+  initPrototype({ active: 'enable' });
+  const checkbox = document.getElementById('confirmCheckbox');
+  const button = document.getElementById('enableButton');
+  checkbox.addEventListener('change', () => {
+    button.disabled = !checkbox.checked;
+  });
+</script>
+</body>
+</html>
